@@ -1,0 +1,22 @@
+The baseline grasping algorithm works as follows:
+
+1 We demonstrate, in a physics simulation, grasps of objects with CAD (mesh) models. 
+
+2 Then we construct contact models at the hand equilibrium (stable joint configuration) by merging contact model distributions from each example within the same grasp type. We will generate many grasps, but we only merge grasps that have a similar equilibrium state. 
+
+3 For the hand configuration model, unlike contact models, we memorise each approach trajectory (do not merge). Each trajectory is a time ordered set of waypoints, where each waypoint is a hand configuration and a control vector (synergy).
+
+4 Construct the configuration model using dimensionality reduction to extract configuration manifolds from multiple approach trajectories at grip equilibrium configurations, independently for each grasp type.
+
+5 Select minimum colision trajectories given grip configuration during grasp optimisation, but ignore contact change over teh trajectory.
+
+6 Computer control vector from memorised trajectories from best minimum-collision trajectory.
+
+Experiments
+
+3 types of grasps: rim, cylinder side (mug side), cylinder top (mug top), ignore table constraints.
+
+Use physics simulatios to generat training data -- multiple examples per grasp type.
+
+Test on Birmingham robot.
+
