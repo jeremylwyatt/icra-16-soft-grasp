@@ -60,6 +60,8 @@
 
 \newcommand{\argmax}[1]{\underset{#1}{\operatorname{argmax}}\medspace}
 
+\graphicspath{{images/}}
+
 \title{\LARGE \bf
 Learning and Inference of Dexterous Grasps for Novel Objects with Underactuated Hands
 }
@@ -98,7 +100,7 @@ One approach would be to learn the typical contact interactions that occur durin
 \section{RELATED WORK}
 Previous work in learning generalisable grasps falls broadly into two classes. One class of approaches utilises the shape of common object parts or their appearance to generalise grasps across object categories \cite{saxena2008b,detry2013a,herzog2014a, kroemer2012a}. This works well for low DoF hands. Another class of approaches captures the global properties of the hand shape either at the point of grasping, or during the approach \cite{ben2012generalization}. This global hand shape can additionally be associated with global object shape, allowing generalisation by warping grasps to match warps of global object shape \cite{hillenbrand2012transferring}. This second class works well for high DoF hands, but generalisation is more limited. We have previously achieved the advantages of both classes, generalising grasps across object categories with high DoF hands. In this paper we go beyond this, learning and generalising grasps for under-actuated hands.
 
-\input{representations.tex}
+\input{./inputTex/representations.tex}
 
 \section{LEARNING}
 
