@@ -1,27 +1,16 @@
-This section describes the representations underpinning our approach. First we describe the kernel density representation  that underpins all the models. The representation of the surface features necessary to encode the contact models follows. Finally we describe the form of the contact model and the hand configuration model. In the rest of the paper we assume that the robot's hand is formed of $N_L$ rigid \emph{links}: a palm, and a number of finger phalanges or links. We denote the set of links $L =\{L_i\}$. The representations are summarised at a high level in a video attached as Extension 2.
-
-
-%Our approach then relies on a pair of models that capture two complementary aspects of the grasping process using this hand representation. The first, referred to as the \emph{contact model}, captures the 3D pose of one hand link $\rl$ \emph{relative} to local features from the object's surface. Given the 3D model of an object that the robot has not grasped yet, contact model $\cm$ allows the robot to compute a set of poses for the corresponding robot link $\rl$. The second model, referred to as the \emph{hand configuration model}, models a set of hand shapes that are compatible with the grasp. The role of the hand configuration model during grasp generation is to constrain the search space. Both models are learned from the same grasp data.
-
-%The remainder of this section details the parametrisation of object surfaces, the contact model, and the hand configuration model.
+We sketch the representations underpinning our approach. We define several models: an object model (partial and acquired from sensing); a model of the contact between a finger link and the object; a model of the whole hand configuration; and a model of the reach to grasp trajectory. First we describe the kernel density representation for all these models. Then we describe the surface features we use to encode some of these models. We assume that the robot's hand comprises $N_L$ rigid \emph{links}: a palm, and several phalanges or links. We denote the set of links $L =\{L_i\}$.
 
 \subsection{Kernel Density Estimation}
-
-
-
 \label{sec:kde}
-
-Much of our work relies on the probabilistic modelling of surface \emph{features}, extracted from 3D object scans. Features are composed of a 3D position, a 3D orientation, and a 2D local surface descriptor that encodes local curvatures. The next section explains in detail the physical observations modelled by those features. In this section, we define the mathematical tools that enable the models discussed below.
-
-Let us denote by $SO(3)$ the group of rotations in three dimensions. A feature belongs to the space $SE(3) \times \mathbb R^2$, where $SE(3) = \mathbb R^3 \times SO(3)$ is the group of 3D \emph{poses} (a 3D position and 3D orientation), and surface descriptors are composed of two real numbers. This paper makes extensive use of probability density functions (PDFs) defined on $SE(3) \times \mathbb R^2$. This section explains how we define these density functions. We represent PDFs non-parametrically with a set of $K$ features (or particles) $x_j$
+$SO(3)$ denotes the group of rotations in three dimensions. A feature belongs to the space $SE(3) \times \mathbb R^2$, where $SE(3) = \mathbb R^3 \times SO(3)$ is the group of 3D \emph{poses}, and surface descriptors are composed of two real numbers. We extensively use probability density functions (PDFs) defined on $SE(3) \times \mathbb R^2$.  We represent these PDFs non-parametrically with a set of $K$ features (or particles) $x_j$
 \begin{equation}
 S = \left\lbrace x_j : x_j \in \mathbb R^3 \times SO(3) \times \mathbb R^2 \right\rbrace_{j \in [1,K]}.
 \end{equation}
-The probability density in a region of space is determined by the local density of the particles in that region. The underlying PDF is created through \emph{kernel density estimation} \cite{silverman1986a}, by assigning a kernel function $\mathcal{K}$ to each particle supporting the density, as
+The probability density in a region is determined by the local density of the particles in that region. The underlying PDF is created through \emph{kernel density estimation} \cite{silverman1986a}, by assigning a kernel function $\mathcal{K}$ to each particle supporting the density, as
 \begin{equation}\label{eq:d}
 \pdf(x) \simeq \sum_{j=1}^K w_j \mathcal{K}(x| x_{j}, \sigma),
 \end{equation}
-where  $\sigma \in \mathbb R^3$ is the kernel bandwidth and $w_j \in \mathbb R^{+}$ is a weight associated to $x_j$ such that $\sum_j w_j = 1$. We use a kernel that factorises into three functions defined on the three components of our domain, namely $\mathbb R^3$, $SO(3)$, and $\mathbb R^2$. Let us denote the separation of feature $x$ into $p \in \mathbb R^3$ for position, a quaternion $q \in SO(3)$ for orientation, $r \in \mathbb R^2$ for the surface descriptor. Furthermore, let us denote by $\mu$ another feature, and its separation into position, orientation and surface descriptor. Finally, we denote by $\sigma$ a triplet of real numbers:
+where  $\sigma \in \mathbb R^3$ is the kernel bandwidth and $w_j \in \mathbb R^{+}$ is a weight associated to $x_j$ such that $\sum_j w_j = 1$. We use a kernel that factorises into three functions defined on the three components of our domain, namely $\mathbb R^3$, $SO(3)$, and $\mathbb R^2$. We denote the separation of feature $x$ into $p \in \mathbb R^3$ for position, a quaternion $q \in SO(3)$ for orientation, and $r \in \mathbb R^2$ for the surface descriptor. Furthermore, let us denote by $\mu$ another feature, and its separation into position, orientation and a surface descriptor. Finally, we denote by $\sigma$ a triplet of real numbers:
 \begin{subequations}
 \begin{align}
 x &= (p, q, r),\\
@@ -34,13 +23,13 @@ We define our kernel as
 \begin{equation}\label{eq:kernel_in_se3}
 \mathcal{K}(x| \mu, \sigma) = \mathcal{N}_3(p| \mu_p, \sigma_p) \Theta(q| \mu_q, \sigma_q) \mathcal{N}_2(r| \mu_r, \sigma_r)
 \end{equation}
-where $\mu$ is the kernel mean point, $\sigma$ is the kernel bandwidth, and where $\mathcal{N}_n$ is an $n$-variate isotropic Gaussian kernel, and ${\Theta}$ corresponds to a pair of antipodal von Mises-Fisher distributions which form a Gaussian-like distribution on $SO(3)$ (for details see \cite{fisher1953a,sudderth2006a}). The value of ${\Theta}$ is given by
+where $\mu$ is the kernel mean point, $\sigma$ is the kernel bandwidth, $\mathcal{N}_n$ is an $n$-variate isotropic Gaussian kernel, and ${\Theta}$ corresponds to a pair of antipodal von Mises-Fisher distributions which form a Gaussian-like distribution on $SO(3)$ \cite{fisher1953a,sudderth2006a}. The value of ${\Theta}$ is given by
 \begin{equation}
 \Theta(q|\mu_q, \sigma_q) = C_4(\sigma_q) \frac {e^{\sigma_q \; \mu_q^T q} + e^{-\sigma_q \; \mu_q^T q}}2
 \end{equation}
 where $C_4(\sigma_q)$ is a normalising constant, and $\mu_q^T q$ denotes the quaternion dot product.
 
-We note that thanks to the nonparametric representation used above, conditional and marginal probabilities can easily be computed from \eq\eqref{eq:d}. The marginal density $\pdf(r)$ is computed as
+Using this representation, conditional and marginal probabilities can easily be computed from \eq\eqref{eq:d}. The marginal density $\pdf(r)$ is computed as
 \begin{align}\label{eq:marginal}
 \pdf(r) & \\
       = & \iint \sum_{j=1}^K w_j \mathcal{N}_3(p| p_i, \sigma_p) \Theta(q| q_i, \sigma_q) \mathcal{N}_2(r| r_i, \sigma_r) \textnormal{d}p\textnormal{d}q \\
@@ -56,7 +45,22 @@ The  conditional density $\pdf(p,q|r)$ is given by
 \subsection{Surface Features}
 \label{sec:surface_features}
 
-This section explains how the surface features discussed above are acquired from real object data. All objects considered in the paper are represented by point clouds constructed from one or multiple shots taken by a depth camera. A depth camera captures a set of points distributed in a 3D space along the object's visible surface. We directly augment these points with a surface normal. As a result, the point clouds discussed below are composed of points that belong to $SE(3)$. We denote position and orientation as $p$, $q$. The surface normal at $p$ is computed from the nearest neighbours of $p$ using a PCA-based method (e.g. \cite{kanatani2005statistical}). 
+All objects considered in the paper are represented by point clouds constructed from one or multiple shots taken by a depth camera. We directly augment these points with a surface normal and a local curvature descriptor. As a result, the point clouds discussed below are composed of points $x$ that belong to $SE(3) \times \mathbb R^2$. We the position, orientation, and curvature components of $x$ as $p$, $q$, and $r$ respectively. For compactness, we also denote the pose of a feature (its position and orientation) as $v$. As a result,
+\begin{equation}
+x = (v, r), \qquad v = (p, q).
+\label{eq:surface.feature}
+\end{equation}
+
+The surface normal at $p$ is computed from the nearest neighbours of $p$ using a PCA-based method (e.g. \citep{kanatani2005statistical}). The surface descriptors are the local \emph{principal curvatures} \citep{spivak1979comprehensive}. Their directions are denoted $k_1, k_2 \in \mathbb R^3$, and the curvatures along $k_1$ and $k_2$ form a $2$-dimensional feature vector $r = (r_1, r_2) \in \mathbb R^2$. %The surface normals and curvatures are computed using the PCL library \citep{Rusu_ICRA2011_PCL}.
+The surface normal and the principal directions define the orientation $q$ of a frame that is associated to a point $p$. 
+
+The procedure described above allows the computation of a set of $K_O$ features  $\lbrace (v_j, r_j) \rbrace$ from an object point cloud. In turn, the set of features defines a joint probability distribution, which we call the \emph{object model}:
+\begin{equation}
+\om(v, r) \equiv \pdf^\om(v, r) \simeq \sum_{j=1}^{K_O} w_j \mathcal{K}(v, r|{x_j}, \sigma_{x})
+%RD: mu and sigma are not properly defined.
+\label{eq:om}
+\end{equation}
+where $\om$ is short for $\pdf^\om$, $x_j = (v_j, r_j)$,  $\mathcal{K}$ is defined in \eq\eqref{eq:kernel_in_se3} with bandwidth $\sigma_{x} = (\sigma_{v}, \sigma_{r})$, and where all weights are equal, $w_j = 1/{K_O}$.
 
 \subsection{Contact Model}\label{sec:contact.model}
 
