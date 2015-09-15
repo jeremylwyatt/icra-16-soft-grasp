@@ -9,35 +9,35 @@ The hand has 19 degrees of freedom distributed in four fingers and an opposable 
 Moving such a hand to grasp an object results in a hard-to-predeict contact and hand shapes due to the adaptivity. To the purpose of this work, we are intereseted in generating examples of this kind. However, recording the trajectory of all bodies into play in a real scenario is not a banal thing when dealing with cluttered and small spaces where human-sized grasps take place, specially if hundreds are required. For this reason, we have opted to generate the examples using a rigid-body dynamic simulator, where these problems are overcome, however, others arise. The main two elements are the contact stability and the hand behavior, which in this case, the latter depends heavily on the former. We are using the standard distribution of Gazebo and Open Dynamic Engine, both widely spread with recognized performance.
 %% but not perfect. There is an on-going work on improving the mesh-to-mesh collision there.
 Regarding the second element, the adaptive synergy equations have been implemented as a plugin which accompanies the proper kinematic description of the Pisa/IIT SoftHand\footnote{The Pisa/IIT SoftHand ROS/Gazebo packages are available at \url{https://github.com/CentroEPiaggio/pisa-iit-soft-hand}}.
-%
-%\begin{figure}
-%  \centering
-%  \begin{tabular}{ccc}
-%
-%  \includegraphics[width=0.3\linewidth]{containerB_pinch_1.png} &
-%
-%  \includegraphics[width=0.3\linewidth]{containerB_rim_1.png} &
-%
-%  \includegraphics[width=0.3\linewidth]{pot_1.png} \\
-%
-%  \includegraphics[width=0.3\linewidth]{containerB_pinch_2.png} &
-%
-%  \includegraphics[width=0.3\linewidth]{containerB_rim_2.png} &
-%
-%  \includegraphics[width=0.3\linewidth]{pot_2.png} \\
-%
-%  \includegraphics[width=0.3\linewidth]{containerB_pinch_4.png} &
-%
-%  \includegraphics[width=0.3\linewidth]{containerB_rim_4.png} &
-%
-%  \includegraphics[width=0.3\linewidth]{pot_3.png} \\
-%
-%  \end{tabular}
-%
-%  \caption{Snapshots of the simulation of a pinch and rim grasp types for the colander (first and second columns), and handle grasp for the pot (last column).}
-%  \label{fig:simulations}
-%\end{figure}
-%
+
+\begin{figure}
+  \centering
+  \begin{tabular}{ccc}
+
+  \includegraphics[width=0.3\linewidth]{containerB_pinch_1.png} &
+
+  \includegraphics[width=0.3\linewidth]{containerB_rim_1.png} &
+
+  \includegraphics[width=0.3\linewidth]{pot_1.png} \\
+
+  \includegraphics[width=0.3\linewidth]{containerB_pinch_2.png} &
+
+  \includegraphics[width=0.3\linewidth]{containerB_rim_2.png} &
+
+  \includegraphics[width=0.3\linewidth]{pot_2.png} \\
+
+  \includegraphics[width=0.3\linewidth]{containerB_pinch_4.png} &
+
+  \includegraphics[width=0.3\linewidth]{containerB_rim_4.png} &
+
+  \includegraphics[width=0.3\linewidth]{pot_3.png} \\
+
+  \end{tabular}
+
+  \caption{Snapshots of the simulation of a pinch and rim grasp types for the colander (first and second columns), and handle grasp for the pot (last column).}
+  \label{fig:simulations}
+\end{figure}
+
 %% HOW WE GENERATED THE DATA
 %
 At the current state, there are no generally accepted measures concerning whether an object being grasped by an underactuated adaptive hand  is good or not, hence the lack of robust grasp planners for them is not a surprise. Thus, generating a large dataset at this point is useless, and there are plans in the future to cover this area. As a result, we generated the examples by guiding manually the hand to a ``nice'' grasp as shown in Fig.~\ref{fig:simulations}. In this simpler scenario, we assume without lost of generality that the grasps are labeled by type. In our example dataset, we have three grasp types namely pinch, rim and by-the-handle. The main difference between pinch and rim is the fingers configuration w.r.t. the top border of objects. In the pinch grasp, the thumb goes inside whereas in the rim grasp, the fingers go inside. In the latter, the container can be filled with liquid while holding, for instance.
