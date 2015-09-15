@@ -1,0 +1,17 @@
+\section{Inference}
+\label{sec:infer}
+
+After acquiring the models from a set of training grasps, we present the robot with a test (query) object. The goal is to find a generalisation of the training grasp that is likely according to each model type. First of all, we obtain a point cloud for the test object, and thus an object model. We then combine every contact model with that object model, so as to obtain a set of {\em query densities}, one for each link with a contact model defined for the example grasp. The $i$-th query density $\qd_i$ is a density modelling where the $i$-th link can be placed, with respect to the surface of a new object. From the query densities, a candidate grasp is generated as follows. We randomly pick a link $i$. We randomly sample, from the corresponding query density $\qd_i$, a pose for link $i$. We sample, from the configuration model $\hc$, a final hand configuration that is compatible with the pose selected for link $i$, and then we compute from forward kinematics the poses of all the remaining hand links. Finally we sample at random, a trajectory from the set leading to the final grasp state. We refine this entire reach to grasp by performing a simulated annealing search in the space of hand poses and configurations, so as to locally maximise the grasp likelihood, Grasp likelihood is the product of the hand configuration density, the reach to grasp density, and the query densities for all the hand links. We repeat the entire process a number of times.
+
+The optimisation procedure generates many possible grasps, each with its likelihood. The following subsections explain how to estimate query densities, and how grasp optimisation is carried out.
+
+\subsection{Query Density Computation}
+
+A query density \eqref{eq:qd} is a density for a  $K_{Q_i}$ kernels centred on the set of weighted finger link poses returned by \alg\ref{alg:mc}:
+\begin{equation}
+\qd_i(s) \simeq \sum^{K_{Q_i}}_{j=1} w_{ij} \mathcal{N}_3(p|{\hat{p}_{ij}}, \sigma_{p}) \Theta(q|{\hat{q}_{ij}}, \sigma_{q})%, \quad i = 1, ..., N_L
+\label{eq:qd.approx}
+\end{equation}
+with $j$-th kernel centre $({\hat{p}_{ij}}, {\hat{q}_{ij}}) = \hat{s}_{ij}$, and where all weights were normalised $\sum_j w_{ij} = 1$. The number of kernels $K_{Q_i} = K_Q$ were chosen equal for all query densities and grasp types (unless otherwise stated). The non-Euclidean domain on which our density estimates are computed makes it difficult and computationally expensive to find optimal values for the bandwidth $\sigma_{p}$ and $\sigma_{q}$. Instead, we set the values of the bandwidths $\sigma_{p}$ and $\sigma_{q}$ using Silverman's popular rule of thumb \cite{silverman}. Silverman's rule does not give optimal bandwidth values, but it has strong empirical support and it yielded good results in our experiments. \fig\ref{fig:grasping.querydensity} depicts two example query densities created for two contact models of a handle grasp.
+
+When a test object is presented a set of query densities $\mathcal{Q}^g$ is calculated for each training grasp $g$. The set $\mathcal{Q}^g =\{\qd_i^g\}$ has $N^g_Q=N^g_M$ members, one for each contact model $M_i^g$ in $\mathcal{M}^g$. The computation of each  query density has time complexity $\Omega( K_{M_i} K_Q)$ where $K_{M_i}$ is the number of kernels of the $i$-th contact model density~\eqref{eq:cm}, and $K_Q$ is the number of kernels of the corresponding query density. 

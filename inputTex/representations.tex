@@ -1,4 +1,4 @@
-We now sketch the representations underpinning our approach. We define several models: an object model (partial and acquired from sensing); a model of the contact between a finger link and the object; a model of the whole hand configuration; and a model of the reach to grasp trajectory. First we describe the kernel density representation for all these models. Then we describe the surface features we use to encode some of these models. We assume that the robot's hand comprises $N_L$ rigid \emph{links}: a palm, and several phalanges or links. We denote the set of links $L =\{L_i\}$.
+We now sketch the representations underpinning our approach. We define several models: an object model (partial and acquired from sensing); a model of the contact between a finger link and the object; a model of the whole hand configuration; and a model of the reach to grasp trajectory. First we describe the kernel density representation for all these models. Then we describe the surface features we use to encode some of these models. Then we follow with a description of each model type. We assume that the robot's hand comprises $N_L$ rigid \emph{links}: a palm, and several phalanges or links. We denote the set of links $L =\{L_i\}$.
 
 \subsection{Kernel Density Estimation}
 \label{sec:kde}
@@ -54,6 +54,9 @@ x = (v, r), \qquad v = (p, q).
 The surface normal at $p$ is computed from the nearest neighbours of $p$ using a PCA-based method (e.g. \cite{kanatani2005statistical}). The surface descriptors are the local \emph{principal curvatures} \cite{spivak1979comprehensive}. Their directions are denoted $k_1, k_2 \in \mathbb R^3$, and the curvatures along $k_1$ and $k_2$ form a $2$-dimensional feature vector $r = (r_1, r_2) \in \mathbb R^2$. %The surface normals and curvatures are computed using the PCL library \citep{Rusu_ICRA2011_PCL}.
 The surface normal and the principal directions define the orientation $q$ of a frame that is associated with the point $p$. 
 
+\subsection{Object Model}
+\label{sec:object_model}
+
 Thus, given a point cloud, a set of $K_O$ features  $\lbrace (v_j, r_j) \rbrace$ can be computed. This set of features defines, in turn, a joint probability distribution, which we call the \emph{object model}:
 \begin{equation}
 \om(v, r) \equiv \pdf^\om(v, r) \simeq \sum_{j=1}^{K_O} w_j \mathcal{K}(v, r|{x_j}, \sigma_{x})
@@ -68,15 +71,16 @@ A contact model $\cm_i$ encodes the joint probability distribution of surface cu
 \begin{equation}\label{eq:M}
 \cm_i(U, R) \equiv \pdf^\cm_i(U, R)
 \end{equation}
-where $\cm_i$ is short for $\pdf^\cm_i$, $R$ is the random variable modelling surface curvature, and $U$ models the pose of $\rl_i$ \emph{relative} to the frame of reference defined by the directions of principal curvature. In other words, denoting realisations of $R$ and $U$ by $r$ and $u$, $\cm_i(u, r)$ is proportional to the probability of finding $\rl_i$ at pose $u$ relative to the frame of a nearby object surface patch that exhibits principal curvatures equal to $r$.
+where $\cm_i$ is short for $\pdf^\cm_i$, $R$ is the random variable modelling surface curvature, and $U$ models the pose of $\rl_i$ \emph{relative} to the frame of reference defined by the directions of principal curvature and the surface normal. In other words, denoting realisations of $R$ and $U$ by $r$ and $u$, $\cm_i(u, r)$ is proportional to the probability of finding $\rl_i$ at pose $u$ relative to the frame of a nearby object surface patch that exhibits principal curvatures equal to $r$.
 
-Given a set of features $\lbrace x_j \rbrace_{j=1}^{K_O}$, with $x_j = (v_j, r_j)$ and $v_j = (p_j, q_j)$, a contact model $\cm_i$ is constructed from them.  Features close to the link surface are more important than those lying far from the surface. Features are thus weighted, to make their influence on $\cm_i$  decrease with their distance to the $i^\textnormal{th}$ link (\fig\ref{fig:representations.modeldist.cont}). We use a weighting function whose value decreases exponentially with the square distance to the link:
+Given a set of features $\lbrace x_j \rbrace_{j=1}^{K_O}$, with $x_j = (v_j, r_j)$ and $v_j = (p_j, q_j)$, a contact model $\cm_i$ is constructed from them.  Features close to the link surface are more important than those lying far from the surface. Features are thus weighted, to make their influence on $\cm_i$  decrease with their distance to the $i^\textnormal{th}$ link. %(\fig\ref{fig:representations.modeldist.cont}). 
+We use a weighting function whose value decreases exponentially with the square distance to the link:
 \begin{equation}
 w_{ij} = \begin{cases}\exp(-\lambda ||p_j-a_{ij}||^2) \quad &\textnormal{ if } ||p_j-a_{ij}|| < \delta_i\\
 0 \quad &\textnormal{ otherwise},\end{cases}
 \label{eq:learning.modeldist.wgh}
 \end{equation}
-where $\lambda \in \mathbb R^{+}$ and $a_{ij}$ is the point on the surface of $\rl_i$ that is closest to $p_j$. The intuitive motivation for this choice is that we require a weight function that falls off quickly so that the contact model will only take account of the local shape, while falling off smoothly.
+where $\lambda \in \mathbb R^{+}$, there is a cut-off distance $\delta_i$, and $a_{ij}$ is the point on the surface of $\rl_i$ that is closest to $p_j$. The intuitive motivation for this choice is that we require a weight function that falls off quickly so that the contact model will only take account of the local shape, while falling off smoothly.
 
 Let us denote by $u_{ij} = (p_{ij}, q_{ij})$ the pose of $\rl_i$ relative to the pose $v_j$ of the $j^{\mathnormal{th}}$ surface feature. In other words, $u_{ij}$ is defined as
 \begin{equation}
@@ -88,8 +92,7 @@ where $s_i$ denotes the pose of $\rl_i$, $\circ$ denotes the pose composition op
 \cm_i(u,r) \simeq \frac 1Z \sum^{K_{M_i}}_{j=1} w_{ij}\mathcal{N}_3(p|{p_{ij}}, \sigma_{p}) \Theta(q|{q_{ij}}, \sigma_{q}) \mathcal{N}_2(r|{r_j}, \sigma_{r})
 \label{eq:cm}
 \end{equation}
-where $Z$ is a normalising constant, $u = (p, q)$, and where $K_{M_i} \leq K_O$ is a number of features which are within cut-off distance $\delta_i$ to the surface of link $\rl_i$. If the number of features $K_{M_i}$ of contact model $\cm_i$ is not sufficiently large, contact model $\cm_i$ is not instantiated and is excluded from any further computation. Consequently, the overall number of contact models $N_M$ is usually smaller than the number of links $N_L$ of the robotic hand. We denote the set of contact models learned from a grasp example $g$ as $\mathcal{M}^g=\{\mathcal{M}^g_i\}$. The contact models are quite different for the different links within a grasp. This can be seen by comparing the marginalised contact models $\cm(r)$ for two example training grasps and two links in \fig\ref{fig:representations.features}.
-
+where $Z$ is a normalising constant, $u = (p, q)$, and where $K_{M_i} \leq K_O$ is a number of features which are within cut-off distance $\delta_i$ to the surface of link $\rl_i$. If the number of features $K_{M_i}$ of contact model $\cm_i$ is not sufficiently large, contact model $\cm_i$ is not instantiated and is excluded from any further computation. Consequently, the overall number of contact models $N_M$ is usually smaller than the number of links $N_L$ of the robotic hand. We denote the set of contact models learned from a grasp example $g$ as $\mathcal{M}^g=\{\mathcal{M}^g_i\}$. 
 %Sum~\eqref{eq:cm} involves only terms for which $x_j = ((p_j, q_j), r_j)$ belong to the neighbourhood of $\rf_i$, $\lbrace x_j: ||p_j-a_{ij}|| \leq \delta, \delta \in \mathbb R^{+} \rbrace$. If the neighbourhood of a particular link $i$ is empty, i.e. $K_{M_i} = 0$, the corresponding contact model is not instantiated and it is excluded from any further computation.
 \begin{figure}[t]
 \centerline{\includegraphics[width=5cm]{resources/model}}
@@ -97,8 +100,7 @@ where $Z$ is a normalising constant, $u = (p, q)$, and where $K_{M_i} \leq K_O$ 
 \label{fig:representations.model}
 \end{figure}
 
-The parameters $\lambda$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically and kept fixed in all experiments reported in \sect\ref{sec:method}. The time complexity for learning each contact model from an example grasp is $\Omega(T K_O)$ where $T$ is the number of triangles in the tri-mesh describing the hand links, and $K_O$ is the number of points in the object model.
-
+The parameters $\lambda$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model from an example grasp is $\Omega(T K_O)$ where $T$ is the number of triangles in the tri-mesh describing the hand links, and $K_O$ is the number of points in the object model.
 
 %\begin{figure}[t]
 %\centering{
@@ -126,6 +128,6 @@ h_c(\gamma) = (1 - \gamma)h^g_c + \gamma h^t_c
 \end{equation}
 where  $w({h_c(\gamma)}) = \exp(-\alpha \|h_c(\gamma) - h^g_c \|^2)$ and $\alpha \in \mathbb R^{+}$. $\alpha$ and $\beta$ were hand tuned and kept fixed in all the experiments. The hand configuration model computation has time complexity $\Omega(d_h K_C)$ where $d_h$ is the number of dimensions of the configuration vector, and $K_C$ is the size of the set of values of $\gamma$ used in \eq\eqref{eq:hc}.
 
-\subsection{Reach to Grasp Trajectory}
+\subsection{Reach to Grasp Trajectory Model}
 
 We encode a reach to grasp trajectory as the combined trajectory of the wrist pose and the hand configuration. Each wrist pose is defined in the frame of reference of the final wrist pose in the trajectory. This final wrist pose is associated with the final hand configuration model and the contact models. We refer to the final hand configuration model, wrist pose and contact models as the model of the final grasp state.  A set of reach to grasp trajectories, including the final grasp states can be defined. We create this set so that the final grasp states are all very close to one another, thus forming an attractor, with the trajectories leading to those similar final grasp states defining an attractor basin.
