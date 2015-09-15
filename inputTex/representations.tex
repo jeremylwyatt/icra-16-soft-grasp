@@ -1,4 +1,4 @@
-We now sketch the representations underpinning our approach. We define several models: an object model (partial and acquired from sensing); a model of the contact between a finger link and the object; a model of the whole hand configuration; and a model of the reach to grasp trajectory. First we describe the kernel density representation for all these models. Then we describe the surface features we use to encode some of these models. Then we follow with a description of each model type. We assume that the robot's hand comprises $N_L$ rigid \emph{links}: a palm, and several phalanges or links. We denote the set of links $L =\{L_i\}$.
+We now sketch the representations underpinning our approach. We define several models: an object model (partial and acquired from sensing); a model of the contact between a finger link and the object; a model of the whole hand configuration; and a model of the reach to grasp trajectory. First we describe the kernel density representation for all these models. Then we describe the surface features we use to encode some of these models. Then we follow with a description of each model type. Throughout we assume that the robot's hand comprises $N_L$ rigid \emph{links}: a palm, and several phalanges or links. We denote the set of links $L =\{L_i\}$. 
 
 \subsection{Kernel Density Estimation}
 \label{sec:kde}
@@ -67,7 +67,7 @@ where $\om$ is short for $\pdf^\om$, $x_j = (v_j, r_j)$,  $\mathcal{K}$ is defin
 
 \subsection{Contact Model}\label{sec:contact.model}
 
-A contact model $\cm_i$ encodes the joint probability distribution of surface curvatures and of the 3D pose of the $i$-th hand link. Let us consider the hand grasping some given object. The contact model for link $\rl_i$ is denoted by
+A contact model $\cm_i$ encodes the joint probability distribution of surface curvatures and of the 3D pose of the $i$-th hand link in the equilibrium state. Let us consider the hand as having grasped some given training object. The contact model for link $\rl_i$ is denoted by
 \begin{equation}\label{eq:M}
 \cm_i(U, R) \equiv \pdf^\cm_i(U, R)
 \end{equation}
@@ -112,16 +112,9 @@ The parameters $\lambda$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chose
 %\label{fig:representations.modeldist.cont}
 %\end{figure}
 
-\subsection{Hand Configuration Model}
+\subsection{Equilibrium State Hand Configuration Model}
 
-The hand configuration model, denoted by $\hc$, encodes a set of configurations of the hand joints $h_c \in \mathbb R^D$ (i.e., joint angles), that are particular to a grasp example. The purpose of this model is to allow us to restrict the grasp search space (during grasp transfer) to hand configurations that resemble those observed while training the grasp.
-
-In order to boost the generalisation capability of the grasping algorithm the hand configuration model encodes the hand configuration that was observed when grasping the training object, but also a set of configurations recorded during the approach towards the object. Let us denote by $h^t_c$ the joint angles at some small distance \emph{before} the hand reached the training object, and by $h^g_c$ the hand joint angles at the time when the hand made contact with the training object. We consider a set of configurations interpolated between $h^t_c$ and $h^g_c$, and extrapolated beyond $h^g_c$, as
-\begin{equation}
-h_c(\gamma) = (1 - \gamma)h^g_c + \gamma h^t_c
-\label{eq:learning.configmodel.config}
-\end{equation}
-\noindent where $\gamma \in \mathbb R$. For all $\gamma < 0$, configurations $h_c(\gamma)$ are beyond $h^g_c$ (see \fig\ref{fig:representations.modeldist.cont}). The hand configuration model $\hc$ is constructed by applying kernel density estimation to \begin{equation}\label{eq:H_c}\mathcal H_c = \lbrace h_c(\gamma): \gamma \in [-\beta, \beta], \beta \in \mathbb R^{+}\rbrace,\end{equation} as 
+The equilibrium state hand configuration model, denoted by $h^e_c(j)$, encodes the hand configuration $h^e_c \in \mathbb R^D$, for the grasp examples $j = 1 \ldots k$ within the set of $k$ training examples of a particular grasp type. The purpose of this model is to restrict the grasp search space (during grasp transfer) to hand configurations that resemble those observed during training. We combine all the equilibrium hand configurations from the different examples to create a single model, using kernel density estimation:
 \begin{equation}
 \hc(h_c) \equiv \sum_{\gamma \in [-\beta, \beta]} w({h_c(\gamma)}) \mathcal{N}_D(h_c|h_c(\gamma), \sigma_{h_c}) 
 \label{eq:hc}
