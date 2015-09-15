@@ -1,4 +1,4 @@
-We sketch the representations underpinning our approach. We define several models: an object model (partial and acquired from sensing); a model of the contact between a finger link and the object; a model of the whole hand configuration; and a model of the reach to grasp trajectory. First we describe the kernel density representation for all these models. Then we describe the surface features we use to encode some of these models. We assume that the robot's hand comprises $N_L$ rigid \emph{links}: a palm, and several phalanges or links. We denote the set of links $L =\{L_i\}$.
+We now sketch the representations underpinning our approach. We define several models: an object model (partial and acquired from sensing); a model of the contact between a finger link and the object; a model of the whole hand configuration; and a model of the reach to grasp trajectory. First we describe the kernel density representation for all these models. Then we describe the surface features we use to encode some of these models. We assume that the robot's hand comprises $N_L$ rigid \emph{links}: a palm, and several phalanges or links. We denote the set of links $L =\{L_i\}$.
 
 \subsection{Kernel Density Estimation}
 \label{sec:kde}
@@ -10,7 +10,7 @@ The probability density in a region is determined by the local density of the pa
 \begin{equation}\label{eq:d}
 \pdf(x) \simeq \sum_{j=1}^K w_j \mathcal{K}(x| x_{j}, \sigma),
 \end{equation}
-where  $\sigma \in \mathbb R^3$ is the kernel bandwidth and $w_j \in \mathbb R^{+}$ is a weight associated to $x_j$ such that $\sum_j w_j = 1$. We use a kernel that factorises into three functions defined on the three components of our domain, namely $\mathbb R^3$, $SO(3)$, and $\mathbb R^2$. We denote the separation of feature $x$ into $p \in \mathbb R^3$ for position, a quaternion $q \in SO(3)$ for orientation, and $r \in \mathbb R^2$ for the surface descriptor. Furthermore, let us denote by $\mu$ another feature, and its separation into position, orientation and a surface descriptor. Finally, we denote by $\sigma$ a triplet of real numbers:
+where  $\sigma \in \mathbb R^3$ is the kernel bandwidth and $w_j \in \mathbb R^{+}$ is a weight associated to $x_j$ such that $\sum_j w_j = 1$. We use a kernel that factorises into three functions defined by the separation of $x$ into $p \in \mathbb R^3$ for position, a quaternion $q \in SO(3)$ for orientation, and $r \in \mathbb R^2$ for the surface descriptor. Furthermore, let us denote by $\mu$ another feature, and its separation into position, orientation and a surface descriptor. Finally, we denote by $\sigma$ a triplet of real numbers:
 \begin{subequations}
 \begin{align}
 x &= (p, q, r),\\
@@ -45,14 +45,14 @@ The  conditional density $\pdf(p,q|r)$ is given by
 \subsection{Surface Features}
 \label{sec:surface_features}
 
-All objects considered in the paper are represented by point clouds constructed from one or multiple shots taken by a depth camera. We directly augment these points with a surface normal and a local curvature descriptor. As a result, the point clouds discussed below are composed of points $x$ that belong to $SE(3) \times \mathbb R^2$. We the position, orientation, and curvature components of $x$ as $p$, $q$, and $r$ respectively. For compactness, we also denote the pose of a feature (its position and orientation) as $v$. As a result,
+All objects considered in the paper are represented by point clouds constructed from one or multiple shots taken by a depth camera. We directly augment these points with a frame of reference and a surface feature that is a local curvature descriptor. For compactness, we also denote the pose of a feature as $v$. As a result,
 \begin{equation}
 x = (v, r), \qquad v = (p, q).
 \label{eq:surface.feature}
 \end{equation}
 
-The surface normal at $p$ is computed from the nearest neighbours of $p$ using a PCA-based method (e.g. \citep{kanatani2005statistical}). The surface descriptors are the local \emph{principal curvatures} \citep{spivak1979comprehensive}. Their directions are denoted $k_1, k_2 \in \mathbb R^3$, and the curvatures along $k_1$ and $k_2$ form a $2$-dimensional feature vector $r = (r_1, r_2) \in \mathbb R^2$. %The surface normals and curvatures are computed using the PCL library \citep{Rusu_ICRA2011_PCL}.
-The surface normal and the principal directions define the orientation $q$ of a frame that is associated to a point $p$. 
+The surface normal at $p$ is computed from the nearest neighbours of $p$ using a PCA-based method (e.g. \cite{kanatani2005statistical}). The surface descriptors are the local \emph{principal curvatures} \cite{spivak1979comprehensive}. Their directions are denoted $k_1, k_2 \in \mathbb R^3$, and the curvatures along $k_1$ and $k_2$ form a $2$-dimensional feature vector $r = (r_1, r_2) \in \mathbb R^2$. %The surface normals and curvatures are computed using the PCL library \citep{Rusu_ICRA2011_PCL}.
+The surface normal and the principal directions define the orientation $q$ of a frame that is associated with the point $p$. 
 
 The procedure described above allows the computation of a set of $K_O$ features  $\lbrace (v_j, r_j) \rbrace$ from an object point cloud. In turn, the set of features defines a joint probability distribution, which we call the \emph{object model}:
 \begin{equation}
