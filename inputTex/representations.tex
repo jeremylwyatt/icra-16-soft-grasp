@@ -60,11 +60,11 @@ Thus, given a point cloud, a set of $K_O$ features  $\lbrace (v_j, r_j) \rbrace$
 %RD: mu and sigma are not properly defined.
 \label{eq:om}
 \end{equation}
-where $\om$ is short for $\pdf^\om$, $x_j = (v_j, r_j)$,  $\mathcal{K}$ is defined in \eq\eqref{eq:kernel_in_se3} with bandwidth $\sigma_{x} = (\sigma_{v}, \sigma_{r})$, and where all weights are equal, $w_j = 1/{K_O}$. We refer to $\om$ as the object model. In summary this object model represents the object as a pdf over surface normals and curvatures.
+where $\om$ is short for $\pdf^\om$, $x_j = (v_j, r_j)$,  $\mathcal{K}$ is defined in \eq\eqref{eq:kernel_in_se3} with bandwidth $\sigma_{x} = (\sigma_{v}, \sigma_{r})$, and where all weights are equal, $w_j = 1/{K_O}$. In summary this object model $\om$ represents the object as a pdf over surface normals and curvatures.
 
 \subsection{Contact Model}\label{sec:contact.model}
 
-A contact model $\cm_i$ encodes the joint probability distribution of surface curvatures and of the 3D pose of the $i$-th hand link. Intuitively Let us consider the hand grasping some given object. The (object) contact model of link $\rl_i$ is denoted by
+A contact model $\cm_i$ encodes the joint probability distribution of surface curvatures and of the 3D pose of the $i$-th hand link. Let us consider the hand grasping some given object. The contact model for link $\rl_i$ is denoted by
 \begin{equation}\label{eq:M}
 \cm_i(U, R) \equiv \pdf^\cm_i(U, R)
 \end{equation}
