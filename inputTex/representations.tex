@@ -54,7 +54,7 @@ x = (v, r), \qquad v = (p, q).
 The surface normal at $p$ is computed from the nearest neighbours of $p$ using a PCA-based method (e.g. \cite{kanatani2005statistical}). The surface descriptors are the local \emph{principal curvatures} \cite{spivak1979comprehensive}. Their directions are denoted $k_1, k_2 \in \mathbb R^3$, and the curvatures along $k_1$ and $k_2$ form a $2$-dimensional feature vector $r = (r_1, r_2) \in \mathbb R^2$. %The surface normals and curvatures are computed using the PCL library \citep{Rusu_ICRA2011_PCL}.
 The surface normal and the principal directions define the orientation $q$ of a frame that is associated with the point $p$. 
 
-The procedure described above allows the computation of a set of $K_O$ features  $\lbrace (v_j, r_j) \rbrace$ from an object point cloud. In turn, the set of features defines a joint probability distribution, which we call the \emph{object model}:
+Thus, given a point cloud, a set of $K_O$ features  $\lbrace (v_j, r_j) \rbrace$ can be computed. This set of features defines, in turn, a joint probability distribution, which we call the \emph{object model}:
 \begin{equation}
 \om(v, r) \equiv \pdf^\om(v, r) \simeq \sum_{j=1}^{K_O} w_j \mathcal{K}(v, r|{x_j}, \sigma_{x})
 %RD: mu and sigma are not properly defined.
