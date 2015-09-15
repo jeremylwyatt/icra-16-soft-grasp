@@ -60,23 +60,23 @@ The procedure described above allows the computation of a set of $K_O$ features 
 %RD: mu and sigma are not properly defined.
 \label{eq:om}
 \end{equation}
-where $\om$ is short for $\pdf^\om$, $x_j = (v_j, r_j)$,  $\mathcal{K}$ is defined in \eq\eqref{eq:kernel_in_se3} with bandwidth $\sigma_{x} = (\sigma_{v}, \sigma_{r})$, and where all weights are equal, $w_j = 1/{K_O}$.
+where $\om$ is short for $\pdf^\om$, $x_j = (v_j, r_j)$,  $\mathcal{K}$ is defined in \eq\eqref{eq:kernel_in_se3} with bandwidth $\sigma_{x} = (\sigma_{v}, \sigma_{r})$, and where all weights are equal, $w_j = 1/{K_O}$. We refer to $\om as the object model. In summary this object model represents the object as a pdf over surface normals and curvatures.
 
 \subsection{Contact Model}\label{sec:contact.model}
 
-A contact model $\cm_i$ encodes the joint probability distribution of surface features and of the 3D pose of the $i$-th hand link. Let us consider the hand grasping some given object. The (object) contact model of link $\rl_i$ is denoted by
+A contact model $\cm_i$ encodes the joint probability distribution of surface curvatures and of the 3D pose of the $i$-th hand link. Intuitively Let us consider the hand grasping some given object. The (object) contact model of link $\rl_i$ is denoted by
 \begin{equation}\label{eq:M}
 \cm_i(U, R) \equiv \pdf^\cm_i(U, R)
 \end{equation}
-where $\cm_i$ is short for $\pdf^\cm_i$, $R$ is the random variable modelling surface features, and $U$ models the pose of $\rl_i$ \emph{relative} to a surface feature. In other words, denoting realisations of $R$ and $U$ by $r$ and $u$, $\cm_i(u, r)$ is proportional to the probability of finding $\rl_i$ at pose $u$ relative to the frame of a nearby object surface feature that exhibits feature vector equal to $r$.
+where $\cm_i$ is short for $\pdf^\cm_i$, $R$ is the random variable modelling surface curvature, and $U$ models the pose of $\rl_i$ \emph{relative} to the frame of reference defined by the directions of principal curvature. In other words, denoting realisations of $R$ and $U$ by $r$ and $u$, $\cm_i(u, r)$ is proportional to the probability of finding $\rl_i$ at pose $u$ relative to the frame of a nearby object surface patch that exhibits principal curvatures equal to $r$.
 
-Given a set of surface features $\lbrace x_j \rbrace_{j=1}^{K_O}$, with $x_j = (v_j, r_j)$ and $v_j = (p_j, q_j)$, a contact model $\cm_i$ is constructed from features from the object's surface.  Surface features  close to the link surface are more important than those lying far from the surface. Features are thus weighted, to make their influence on $\cm_i$  decrease with their squared distance to the $i^\textnormal{th}$ link (\fig\ref{fig:representations.modeldist.cont}). Additionally, features that are further than a cut-off distance $\delta_i$ from $\rl_i$ are ignored. We opted for a weighting function whose value decreases exponentially with the square distance to the link:
+Given a set of features $\lbrace x_j \rbrace_{j=1}^{K_O}$, with $x_j = (v_j, r_j)$ and $v_j = (p_j, q_j)$, a contact model $\cm_i$ is constructed from them.  Features close to the link surface are more important than those lying far from the surface. Features are thus weighted, to make their influence on $\cm_i$  decrease with their distance to the $i^\textnormal{th}$ link (\fig\ref{fig:representations.modeldist.cont}). We use a weighting function whose value decreases exponentially with the square distance to the link:
 \begin{equation}
 w_{ij} = \begin{cases}\exp(-\lambda ||p_j-a_{ij}||^2) \quad &\textnormal{ if } ||p_j-a_{ij}|| < \delta_i\\
 0 \quad &\textnormal{ otherwise},\end{cases}
 \label{eq:learning.modeldist.wgh}
 \end{equation}
-where $\lambda \in \mathbb R^{+}$ and $a_{ij}$ is the point on the surface of $\rl_i$ that is closest to $p_j$. The intuitive motivation for this choice is that we require a weight function that falls off quickly so as to constrain each contact model to a limited volume around the related links. This means that the contact model will only take account of the local shape, while falling off smoothly. A variety of monotonic, fast declining functions could be used instead.
+where $\lambda \in \mathbb R^{+}$ and $a_{ij}$ is the point on the surface of $\rl_i$ that is closest to $p_j$. The intuitive motivation for this choice is that we require a weight function that falls off quickly so that the contact model will only take account of the local shape, while falling off smoothly.
 
 Let us denote by $u_{ij} = (p_{ij}, q_{ij})$ the pose of $\rl_i$ relative to the pose $v_j$ of the $j^{\mathnormal{th}}$ surface feature. In other words, $u_{ij}$ is defined as
 \begin{equation}
@@ -128,4 +128,4 @@ where  $w({h_c(\gamma)}) = \exp(-\alpha \|h_c(\gamma) - h^g_c \|^2)$ and $\alpha
 
 \subsection{Reach to Grasp Trajectory}
 
-
+We encode a reach to grasp trajectory as the combined trajectory of the wrist pose and the hand configuration. Each wrist pose is defined in the frame of reference of the final wrist pose in the trajectory. This final wrist pose is associated with the final hand configuration model and the contact models. We refer to the final hand configuration model, wrist pose and contact models as the model of the final grasp state.  A set of reach to grasp trajectories, including the final grasp states can be defined. We create this set so that the final grasp states are all very close to one another, thus forming an attractor, with the trajectories leading to those similar final grasp states defining an attractor basin.
