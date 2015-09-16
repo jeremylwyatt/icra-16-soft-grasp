@@ -1,7 +1,7 @@
 
 After acquiring the models from a set of training grasps, we present the robot with a test (query) object. The goal is to find a generalisation of the training grasp that is likely according to all of the model types simultaneously. First of all, we obtain a point cloud for the test object, and thus an object model. We then combine every contact model with that object model, so as to obtain a set of {\em query densities}, one for each link with a contact model defined for the example grasp. The $i$-th query density $\qd_i$ is a density modelling where the $i$-th link can be placed, in the equilibrium state, with respect to the surface of a new object. 
 
-From the query densities, a candidate equilibrium grasp state is generated . This is then augmented with a reach to grasp trajectory that finishes close to the candidate equilibrium grasp state. Finally we refine the equilibrium grasp and reach to grasp by performing a simulated annealing search in the space of equilibrium state wrist poses and hand configurations, so as to maximise the grasp likelihood. We repeat the entire process many times. This procedure generates many possible grasps, ranked likelihood. We give details below.
+From the query densities, a candidate equilibrium grasp state is generated. This is then augmented with a reach to grasp trajectory that finishes close to the candidate equilibrium grasp state. Finally we refine the equilibrium grasp and reach to grasp by performing a simulated annealing search in the space of equilibrium state wrist poses and hand configurations, so as to maximise the grasp likelihood. We repeat the entire process many times. This procedure generates many possible grasps, ranked by likelihood. We give details below.
 
 \subsection{Query Density}
 
@@ -37,7 +37,7 @@ Having generated an initial solution set $\mathcal{H}^{1}$ stages of optimisatio
 
  \includegraphics[width=0.45\linewidth]{images/config_space_plots/2_basin_of_attraction}
   \includegraphics[width=0.45\linewidth]{images/config_space_plots/5_trajectory_adaptation}
- \caption{{We acquire set of trajectories that, associated with a model of the final equilibrium grasp state, form an attractor basin around that state.}}
+ \caption{{(Left) We acquire set of reach to grasp trajectories that, associated with a model of the final equilibrium grasp state, form an attractor basin around that state. (Right) When an equilibrium state hand configuration is generated (triangle) a reach to grasp trajectory is sampled, and then the configuration component of the trajectory is smoothly interpolated between the selected reach to grasp and the generated equilibrium state grasp.}}
   \label{fig:reaches}
 \end{figure}
 

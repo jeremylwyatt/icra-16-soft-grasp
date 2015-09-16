@@ -45,7 +45,7 @@ The  conditional density $\pdf(p,q|r)$ is given by
 \subsection{Surface Features}
 \label{sec:surface_features}
 
-All objects considered in the paper are represented by point clouds constructed from one or multiple shots taken by a depth camera. We directly augment these points with a frame of reference and a surface feature that is a local curvature descriptor. For compactness, we also denote the pose of a feature as $v$. As a result,
+All objects considered in the paper are represented by point clouds for the purpose of learning and testing. Test object models were constructed from a single view with a depth camera, and were thus incomplete5. We directly augment these points with a frame of reference and a surface feature that is a local curvature descriptor. For compactness, we also denote the pose of a feature as $v$. As a result,
 \begin{equation}
 x = (v, r), \qquad v = (p, q).
 \label{eq:surface.feature}
@@ -120,13 +120,13 @@ The parameters $\lambda$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chose
 
 The equilibrium state hand configuration model, denoted $h^e_c(j) \in \mathbb R^D$, for the grasp examples $j = 1 \ldots k$ within the set of $k$ training examples of a particular grasp type $g$. The purpose of this model is to restrict the grasp search space (during grasp transfer) to hand configurations that resemble those observed during training. We combine the configurations for the examples $j = 1 \ldots k$ to create a single mixture model density:
 \begin{equation}
-\hc_g(h^e_c) \equiv \sum_{j=1}^{k} \mathcal{N}_D(h^e_c|h^e_c(j), \sigma_{h^e_c}) 
+\hc^g(h^e_c) \equiv \sum_{j=1}^{k} \mathcal{N}_D(h^e_c|h^e_c(j), \sigma_{h^e_c}) 
 \label{eq:hc}
 \end{equation}
 This expresses a density over hand configurations in the equilibrium state for a grasp type $g$.
 
 \subsection{Reach to Grasp Model}
 
-For a particular grasp type, in addition to modelling the equilibrium states of the hand, we must also model the trajectories taken to reach those equilibrium states. A single reach to grasp trajectory for an underactuated hand has three elements: the tool centre point (wrist) trajectory, the hand configuration trajectory, and the motor signal trajectory. We assume that a trajectory starts at time $t_0$ and ends in the equilibrium state at time $t_e$. We denote the wrist trajectory $h_w^{0:e}$, the hand configuration trajectory $h_c^{0:e}$, and the motor signal trajectory $h_m^{0:e}$ respectively. The motor signal can be a wide variety of signals in practice. Here we choose it to be the position of the single actuator. When the hand is not in contact with an object the motor signal and the wrist pose together determine the hand configuration. When in contact, the actual hand configuration will differ. The reach to grasp model is simply the concatenation of each component $(h_w^{0:e} , h_c^{0:e} , h_m^{0:e})$. The set of reach to grasp trajectory models defining an attractor basin, leading towards the final hand configuration.
+For a particular grasp type, in addition to modelling the equilibrium states of the hand, we must also model the trajectories taken to reach those equilibrium states. A single reach to grasp trajectory for an underactuated hand has three elements: the tool centre point (wrist) trajectory, the hand configuration trajectory, and the motor signal trajectory. We assume that a trajectory starts at time $t_0$ and ends in the equilibrium state at time $t_e$. We denote the wrist trajectory $h_w^{0:e}$, the hand configuration trajectory $h_c^{0:e}$, and the motor signal trajectory $h_m^{0:e}$ respectively. The motor signal can be a wide variety of signals in practice. Here we choose it to be the position of the single actuator. When the hand is not in contact with an object the motor signal and the wrist pose together determine the hand configuration. When in contact, the actual hand configuration will differ. The reach to grasp model is simply the concatenation of each component $(h_w^{0:e} , h_c^{0:e} , h_m^{0:e})$. The set of reach to grasp trajectory models define an attractor basin, leading towards the final hand configuration.
 
 In the next section we explain how we gather the grasp examples that are used to learn these models. Then in Section~\ref{sec:infer} the inference method---by which the models are used to generate grasps for new objects---is described.
