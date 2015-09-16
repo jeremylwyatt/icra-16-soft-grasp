@@ -5,7 +5,7 @@ From the query densities, a candidate equilibrium grasp state is generated . Thi
 
 \subsection{Query Density}
 
-A query density \eqref{eq:qd} is expressed, for a hand link and an object model, as a density for the pose of that hand link relative to the object. Intuitively the query density encourages a finger link to make contact with the object at locations that have similar local surface curvature to that in the training example. Specifically, we use $K_{Q_i}$ kernels centred on the set of weighted finger link poses:
+A query density is, for a hand link and an object model, a density over the pose of that hand link relative to the object. Intuitively the query density encourages a finger link to make contact with the object at locations that have similar local surface curvature to that in the training example. Specifically, we use $K_{Q_i}$ kernels centred on the set of weighted finger link poses:
 \begin{equation}
 \qd_i(s) \simeq \sum^{K_{Q_i}}_{j=1} w_{ij} \mathcal{N}_3(p|{\hat{p}_{ij}}, \sigma_{p}) \Theta(q|{\hat{q}_{ij}}, \sigma_{q})%, \quad i = 1, ..., N_L
 \label{eq:qd.approx}
@@ -24,11 +24,14 @@ return $\{  (\hat{p}_{ij}, \hat{q}_{ij}, w_{ij} ) \}, \,  \forall j $
 \end{tabbing}\end{minipage}
 \end{algorithmbox}
 
-\subsubsection{Equilibrium Grasp Generation} 
-One query densities have been created for the new object for each training example, an initial set of equilibrium state grasps is generated for each grasp type $g$. For each new initial equilibrium grasp of a particular grasp type we proceed as follows. First an example grasp is selected at random. Then a finger link is selected at random. This ‘seed’ link indexes its query density $\qd_i^g$. A link pose $s_i$ is then sampled from that query density. Then an equilibrium state hand configuration $h^e_c$ is sampled from $\hc^g$. Together the seed link and the hand configuration define a complete equilibrium state hand pose $h$ in the workspace via forward kinematics. This is an initial `seed' grasp, which will subsequently be refined. A large set of such initial solutions is generated, where $h_e^g(j)=(h_w^{e}(j) , h_c^{e}(j) , h_m^{e}(j))$ means the $j^{th}$ initial solution for  grasp type $g$. 
+\subsection{Equilibrium Grasp Generation} 
+Once query densities have been created for the new object for each training example, an initial set of equilibrium state grasps is generated for each grasp type $g$. For each candidate equilibrium grasp of a particular grasp type we proceed as follows. First an example grasp is selected at random. Then a finger link is selected at random. This ‘seed’ link indexes its query density $\qd_i^g$. A link pose $s_i$ is then sampled from that query density. Then an equilibrium state hand configuration $h^e_c$ is sampled from $\hc^g$. Together the seed link and the hand configuration define a complete equilibrium state hand pose $h$ in the workspace via forward kinematics. This is an initial `seed' grasp, which will subsequently be refined. A large set of such initial solutions is generated, where $h_e^g(j)=(h_w^{e}(j) , h_c^{e}(j))$ means the $j^{th}$ initial solution for  grasp type $g$.
 
 \subsection{Reach to Grasp Generation}
-Given an equilibrium grasp, a reach to grasp trajectory is selected and adapted to maximise the chance of reaching that equilibrium grasp state. Specifically, the reach to grasp model $(h_w^{0:e} , h_c^{0:e} , h_m^{0:e})$ which has a final hand configuration state $h^e_c$ with the smallest Euclidean distance in joint space to the $j^th$ equilibrium grasp $h_e^g(j)$ is paired with that grasp. To align it, the wrist trajectory $h_w^{0:e}$ is defined relative to the frame $h_w^{e}(j)$. Then the configuration trajectory $h_c^{0:e}$ is warped (Fig\ref{fig:reaches}) with a first-order lag function so that it smoothly shifts from $h_c^{0}$ to $h_c^{e}(j)$. Having generated an initial solution set $\mathcal{H}^{1}$ stages of optimisation and selection are interleaved.
+Given an equilibrium grasp, a reach to grasp trajectory is selected and adapted to maximise the chance of reaching that equilibrium grasp state. Specifically, we sample a reach to grasp model $(h_w^{0:e} , h_c^{0:e} , h_m^{0:e})$ according to a multinomial probability distribution created by the normalised values of a Gaussian centred on the candidate equilibrium grasp $h_e^g(j)$. To align the selected reach to grasp to the candidate equilibrium grasp, the wrist trajectory $h_w^{0:e}$ is trivially redefined to be relative to the frame $h_w^{e}(j)$. Then the configuration trajectory only $h_c^{0:e}$ is warped (see Fig. \ref{fig:reaches}) so that it smoothly shifts from $h_c^{0}$ to $h_c^{e}(j)$ from the beginning to the end of the trajectory. 
+%The equation is:
+%where $d = dist(h^e_c,h_e^g(j))$. 
+Having generated an initial solution set $\mathcal{H}^{1}$ stages of optimisation and selection are then interleaved.
 
 \begin{figure}
 
@@ -38,13 +41,31 @@ Given an equilibrium grasp, a reach to grasp trajectory is selected and adapted 
   \label{fig:reaches}
 \end{figure}
 
-\subsubsection{Grasp Optimisation Steps}
-The objective of the grasp optimisation steps is, given a candidate grasp and a grasp model $g$, to find a grasp that maximises the product of the likelihoods of the query densities and the hand configuration density
+\subsection{Grasp Optimisation}
+The objective of the grasp optimisation steps is, given a candidate equilibrium grasp and a reach to grasp model, to find a grasp that maximises the product of the likelihoods of the query densities and the hand configuration density
 \begin{align}
 \argmax{(h)}  \mathcal{L}^g(h) & \\
  = \argmax{(h)}  \mathcal{L}^g_\hc(h) \mathcal{L}^g_\qd(h) \\
  = \argmax{(h_w, h_c)}   \hc^{g}(h_c) \prod_{\qd_i^g \in \mathcal{Q}^g} \qd_i^g\left(k_{i}^{\mathrm{for}}\left(h_w, h_c\right)\right)
 \label{eq:grasping.product}
 \end{align}
-where ${\cal L}^g(h)$ is the overall likelihood, where $\hc^g(h_c)$ is the hand configuration model~\eqref{eq:hc}, $\qd_i^g$ are query densities~\eqref{eq:qd.approx}. Thus whereas each initial grasp is generated using only a single query density, grasp optimisation requires evaluation of the grasp against all query densities. It is only in this improvement phase that all query densities must be used.
- Improvement is by simulated annealing (SA) \cite{kirkpatrick83optimizationby}. The SA temperature $T$ is declined linearly from $T_{1}$ to $T_{K}$ over the $K$ steps. In each time step, one step of simulated annealing is applied to every grasp $m$ in $\mathcal{H}^k$.
+where ${\cal L}^g(h)$ is the overall likelihood, where $\hc^g(h_c)$ is the hand configuration model~\eqref{eq:hc}, $\qd_i^g$ are query densities~\eqref{eq:qd.approx}. Thus whereas each initial grasp is generated using only a single query density, grasp optimisation requires evaluation of the grasp against all query densities. It is only in this improvement phase that all query densities must be used. Improvement is by simulated annealing (SA) \cite{kirkpatrick83optimizationby}. The SA temperature $T$ is declined linearly from $T_{1}$ to $T_{K}$ over the $K$ steps. In each time step, one step of simulated annealing is applied to every grasp $m$ in $\mathcal{H}^k$.
+ 
+ \subsection{Grasp Selection}
+At predetermined selection steps (here steps 1 and 50 of annealing), grasps are ranked and only the most likely $10\%$ retained for further optimisation. During these selection steps the criterion in \eqref{eq:grasping.product} is augmented with an additional expert $\coll(h_w, h_c)$ penalising collisions for the entire reach to grasp trajectory in a soft manner. This soft collision expert has a cost that rises exponentially with the greatest degree of penetration through the object point cloud by any of the hand links. We thus refine \eq\ref{eq:grasping.product}:
+
+\begin{eqnarray}
+{\cal L}^g(h) & = & {\cal L}^g_\coll(h) {\cal L}^g_\hc(h) {\cal L}^g_\qd(h)
+\label{eq:grasping.likelihood} \\
+                    & = & \coll(h_w, h_c) \hc^g(h_c) \prod_{\qd_i \in \mathcal{Q}^{g}} \qd^g_i\left(k_{i}^{\mathrm{for}}\left(h_w, h_c\right)\right)
+\end{eqnarray}
+
+where ${\cal L}^g(h)$ is now factorised into three parts, which evaluate the collision, hand configuration and query density experts, all at a given hand pose $h$. A final refinement  of the selection criterion is due to the fact the number of links involved in a grasp varies across grasp types. Thus the number of query densities $N^{g_1}_\qd$, $N^{g_2}_\qd$ for different grasp models $g_1 \neq g_2$ also varies, and so the values of ${\cal L}^{g_1}$ and ${\cal L}^{g_2}$ cannot be compared directly. Given the grasp with the maximum number of involved links $N^{\max}_\qd$, we therefore normalise the likelihood value~\eqref{eq:grasping.likelihood} with
+\begin{equation}
+\left\|{\cal L}^g(h)\right\| = {\cal L}^g_\coll(h) {\cal L}^g_\hc(h) \left({\cal L}^g_\qd(h)\right)^{\frac{N^{\max}_\qd}{N^g_\qd}}.
+\label{eq:grasping.likelihood.norm}
+\end{equation}
+It is this normalised likelihood $\left\|{\cal L}^g\right\|$ that is used to rank all the generated grasps across all the grasp types during selection steps. After \alg\ref{alg:grasp-opt} has yielded a ranked list of optimised grasp poses, they are checked for reachability given other objects in the workspace, and unreachable poses are pruned. 
+
+\subsection{Grasp Execution}
+The remaining best scoring hand pose $h*$ is then used to generate a reach to grasp trajectory. Since the hand is underactuated this consists of the wrist pose trajectory, and the motor signal trajectory. This is the command sequence that is executed on the robot.
