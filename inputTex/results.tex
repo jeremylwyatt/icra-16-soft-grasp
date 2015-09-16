@@ -1,5 +1,7 @@
 The experiments were conducted as follows. Training consisted of nine example grasps, executed in simulation, with a human in control. These nine grasps were grouped into three grasp types (rim, pinch, and handle). The rim and pinch grasp types were trained on the colander object, and the handle grasp type was demonstrated on the saucepan. During testing an object was placed on the table. Every grasp type was compared automatically, and one selected for execution according to the methods described above. The models of the test objects consisted of a point cloud taken from just one view. Thus reconstructions were partial, typically less that 25\% of the object's surface area. No test objects had been seen previously by the robot, and it can be seen from Fig.~\ref{fig:test}. Fifteen test objects were presented, and 12 of the 15 test grasps succeeded, giving a generalisation success rate of 80\%. While the difference is not statistically significant, this is slightly higher than the 77.7\% success rate we recorded on a larger test set for a fully actuated hand also working from a single view of an object \cite{kopicki-detry-wyatt-etal-ijrr-2015}.
 
+It is worth noting the similiarity between the location of the actual and targetted final grasp states. In a majority of cases the grasp involved interactions with the object, moving it to the stable grasp pose. This is a natural property of the hand, but it might have been supposed that the learning method would not be robust to such interactions in terms of the accuracy of the grasp. 
+
 \begin{figure}
 \begin{center}
  \includegraphics[width=0.9\columnwidth]{images/object_set_small}
@@ -45,3 +47,4 @@ The experiments were conducted as follows. Training consisted of nine example gr
  \label{fig:test}
  \end{center}
 \end{figure*}
+
