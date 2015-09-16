@@ -65,7 +65,7 @@ where ${\cal L}^g(h)$ is now factorised into three parts, which evaluate the col
 \left\|{\cal L}^g(h)\right\| = {\cal L}^g_\coll(h) {\cal L}^g_\hc(h) \left({\cal L}^g_\qd(h)\right)^{\frac{N^{\max}_\qd}{N^g_\qd}}.
 \label{eq:grasping.likelihood.norm}
 \end{equation}
-It is this normalised likelihood $\left\|{\cal L}^g\right\|$ that is used to rank all the generated grasps across all the grasp types during selection steps. After \alg\ref{alg:grasp-opt} has yielded a ranked list of optimised grasp poses, they are checked for reachability given other objects in the workspace, and unreachable poses are pruned. 
+It is this normalised likelihood $\left\|{\cal L}^g\right\|$ that is used to rank all the generated grasps across all the grasp types during selection steps. After simulated annealing has yielded a ranked list of optimised grasp poses, they are checked for reachability given other objects in the workspace, and unreachable poses are pruned. 
 
 \subsection{Grasp Execution}
 The remaining best scoring hand pose $h*$ is then used to generate a reach to grasp trajectory. Since the hand is underactuated this consists of the wrist pose trajectory, and the motor signal trajectory. This is the command sequence that is executed on the robot.
