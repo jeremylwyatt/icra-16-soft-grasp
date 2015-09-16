@@ -38,7 +38,7 @@ Moving such a hand to grasp an object results in a hard-to-predict contact and h
 %
 At the current state, there are no generally accepted measures concerning whether an object being grasped by an underactuated adaptive hand  is good or not, hence the lack of robust grasp planners for them is not a surprise. Thus, generating a large dataset at this point is useless, and there are plans in the future to cover this area. As a result, we generated the examples by guiding manually the hand to a ``nice'' grasp as shown in Fig.~\ref{fig:simulations}. In this simpler scenario, we assume without lost of generality that the grasps are labeled by type. In our example dataset, we have three grasp types namely pinch, rim and by-the-handle. The main difference between pinch and rim is the fingers configuration w.r.t. the top border of objects. In the pinch grasp, the thumb goes inside whereas in the rim grasp, the fingers go inside. In the latter, the container can be filled with liquid while holding, for instance.
 %
-For each grasp example, the corresponding dataset comprises the set of trajectories as described above.
+For each grasp example, the corresponding dataset comprises the set of trajectories as described in the previous section.
 
 %For each grasp example, the corresponding dataset comprises the set of body trajectories, expicitly their position, $p_i(t) \in \mathbb{R}^3$, and orientation, $q_i(t) \in SO(3)$, over time for $i=1 , \ldots , m$ bodies (including hand links), and an associated set of hand configurations, $h_c(t) \in R^{n}$, with $n$ the hand degrees of freedom.
 %%associated set of hand configurations, %$h_c(t) \in R^{n}$, with $n$ the hand degrees of freedom.
