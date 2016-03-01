@@ -77,14 +77,14 @@ We now describe the representations for each of the three models that are learne
 \label{fig:contact_recfield}
 \end{figure}
 
-The \textit{contact receptive field} $\rf_i$ is a region of space relative to the associated robot link $\rl_i$ (see \fig\ref{fig:contact_recfield}) which specifies the neighbourhood of a particular robot link. The contact receptive field $\rf_i$ is realised as a function of surface feature $x$:
+The \textit{contact receptive field} $\rf_i$ is a region of space relative to the associated robot link $\rl_i$ (see \fig\ref{fig:contact_recfield}) which specifies the neighbourhood of a particular robot link. The contact receptive field $\rf_i$ is realised as a function of surface feature pose $v$:
 \begin{equation}
-\rf_{i} : x \rightarrow 0..1
+\rf_{i} : v \rightarrow 0..1
 \label{eq:contact_recfield_model}
 \end{equation}
 the value of which determines the relevance of a particular surface feature $x = (v, r)$ to a given link $\rl_i$ in terms of the likelihood of the physical contact. We use contact receptive fields which are family of parameterised functions for which the value falls off quickly with the distance to the link:
 \begin{equation}
-\rf_{i}(x|\lambda_i,\delta_i) = \begin{cases}\exp(-\lambda_i ||p-a||^2) \quad &\textnormal{ if } ||p-a|| < \delta_i\\
+\rf_{i}(v|\lambda_i,\delta_i) = \begin{cases}\exp(-\lambda_i ||p-a||^2) \quad &\textnormal{ if } ||p-a|| < \delta_i\\
 0 \quad &\textnormal{ otherwise},\end{cases}
 \label{eq:contact_recfield_func}
 \end{equation}
@@ -109,15 +109,15 @@ where $\cm_i$ is short for $\pdf^\cm_{in}$, $R$ is the random variable modelling
 The contact model of object $n$ is estimated as
 \begin{equation}\label{eq:cm_n}
 \begin{split}
-&\cm_{in}(u, r) \simeq \frac 1Z \int \mathcal{K}(u|v^{-1}s_i, \sigma_\cm) \om_{n}(v, r) \rf_{i}(t) dv\\
-&= \frac 1Z \sum_{j=1}^{K_{O_n}} \mathcal{K}(u|v_k^{-1}s_i, \sigma_v) \mathcal{N}_2({r}| r_{jn}, \sigma_r) \rf_{i}(x_{jn})
+&\cm_{in}(u, r) \simeq \frac 1Z \int \mathcal{K}(u|v^{-1}s_i, \sigma_\cm) \om_{n}(v, r) \rf_{i}(v) dv\\
+&= \frac 1Z \sum_{j=1}^{K_{O_n}} \mathcal{K}(u|v_k^{-1}s_i, \sigma_v) \mathcal{N}_2({r}| r_{jn}, \sigma_r) \rf_{i}(v_{jn})
 \end{split}
 \end{equation}
 where $Z \in \mathbb R^+$ is a normalising constant and $\mathcal{K}$ is kernel function \eqref{eq:kernel_in_se3} defined at poses from \eq\eqref{eq:local.pose}, and where we have performed integration over all kernels of the object model \eqref{eq:om} which uniquely determine poses $v$.
 
-We also introduce \textit{contact model norm}, which estimates the likelihood of a physical contact of link $i$ with points on the object $n$:
+We also introduce \textit{contact model norm}, which estimates the likelihood of a physical contact of link $i$ with surface features of object $n$:
 \begin{equation}\label{eq:cm_norm}
-\|\cm_{in}\| = \frac 1Z \sum_{j=1}^{K_{O_n}} \rf_{i}(x_{jn})
+\|\cm_{in}\| = \frac 1Z \sum_{j=1}^{K_{O_n}} \rf_{i}(v_{jn})
 \end{equation}
 where $Z \in \mathbb R^+$ is a normalising constant.
 
