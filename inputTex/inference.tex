@@ -43,22 +43,20 @@ Having generated an initial solution set $\mathcal{H}^{1}$ stages of optimisatio
 
 \subsection{Grasp Optimisation}
 The objective of the grasp optimisation steps is, given a candidate equilibrium grasp and a reach to grasp model, to find a grasp that maximises the product of the likelihoods of the query densities and the hand configuration density
-\begin{align}
-\argmax{(h)}  \mathcal{L}^g(h) & \\
- = \argmax{(h)}  \mathcal{L}^g_\hc(h) \mathcal{L}^g_\qd(h) \\
+\begin{multline}
+\argmax{(h)}  \mathcal{L}^g(h) = \argmax{(h)}  \mathcal{L}^g_\hc(h) \mathcal{L}^g_\qd(h) \\
  = \argmax{(h_w, h_c)}   \hc^{g}(h_c) \prod_{\qd_i^g \in \mathcal{Q}^g} \qd_i^g\left(k_{i}^{\mathrm{for}}\left(h_w, h_c\right)\right)
 \label{eq:grasping.product}
-\end{align}
+\end{multline}
 where ${\cal L}^g(h)$ is the overall likelihood, where $\hc^g(h_c)$ is the hand configuration model~\eqref{eq:hc}, $\qd_i^g$ are query densities~\eqref{eq:qd.approx}. Thus whereas each initial grasp is generated using only a single query density, grasp optimisation requires evaluation of the grasp against all query densities. It is only in this improvement phase that all query densities must be used. Improvement is by simulated annealing (SA) \cite{kirkpatrick83optimizationby}. The SA temperature $T$ is declined linearly from $T_{1}$ to $T_{K}$ over the $K$ steps. In each time step, one step of simulated annealing is applied to every grasp $m$ in $\mathcal{H}^k$.
  
  \subsection{Grasp Selection}
 At predetermined selection steps (here steps 1 and 50 of annealing), grasps are ranked and only the most likely $10\%$ retained for further optimisation. During these selection steps the criterion in \eqref{eq:grasping.product} is augmented with an additional expert $\coll(h_w, h_c)$ penalising collisions for the entire reach to grasp trajectory in a soft manner. This soft collision expert has a cost that rises exponentially with the greatest degree of penetration through the object point cloud by any of the hand links. We thus refine \eq\ref{eq:grasping.product}:
 
-\begin{eqnarray}
-{\cal L}^g(h) & = & {\cal L}^g_\coll(h) {\cal L}^g_\hc(h) {\cal L}^g_\qd(h)
-\label{eq:grasping.likelihood} \\
-                    & = & \coll(h_w, h_c) \hc^g(h_c) \prod_{\qd_i \in \mathcal{Q}^{g}} \qd^g_i\left(k_{i}^{\mathrm{for}}\left(h_w, h_c\right)\right)
-\end{eqnarray}
+\begin{multline}\label{eq:grasping.likelihood}
+{\cal L}^g(h) = {\cal L}^g_\coll(h) {\cal L}^g_\hc(h) {\cal L}^g_\qd(h) = \\
+= \coll(h_w, h_c) \hc^g(h_c) \prod_{\qd_i \in \mathcal{Q}^{g}} \qd^g_i\left(k_{i}^{\mathrm{for}}\left(h_w, h_c\right)\right)
+\end{multline}
 
 where ${\cal L}^g(h)$ is now factorised into three parts, which evaluate the collision, hand configuration and query density experts, all at a given hand pose $h$. A final refinement  of the selection criterion is due to the fact the number of links involved in a grasp varies across grasp types. Thus the number of query densities $N^{g_1}_\qd$, $N^{g_2}_\qd$ for different grasp models $g_1 \neq g_2$ also varies, and so the values of ${\cal L}^{g_1}$ and ${\cal L}^{g_2}$ cannot be compared directly. Given the grasp with the maximum number of involved links $N^{\max}_\qd$, we therefore normalise the likelihood value~\eqref{eq:grasping.likelihood} with
 \begin{equation}

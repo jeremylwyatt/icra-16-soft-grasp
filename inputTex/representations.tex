@@ -30,17 +30,17 @@ where $\mu$ is the kernel mean point, $\sigma$ is the kernel bandwidth, $\mathca
 where $C_4(\sigma_q)$ is a normalising constant, and $\mu_q^T q$ denotes the quaternion dot product.
 
 Using this representation, conditional and marginal probabilities can easily be computed from \eq\eqref{eq:d}. The marginal density $\pdf(r)$ is computed as
-\begin{align}\label{eq:marginal}
-\pdf(r) & \\
-      = & \iint \sum_{j=1}^K w_j \mathcal{N}_3(p| p_i, \sigma_p) \Theta(q| q_i, \sigma_q) \mathcal{N}_2(r| r_i, \sigma_r) \textnormal{d}p\textnormal{d}q \\
-      = &  \sum_{j=1}^K w_j \mathcal{N}_2(r| r_j, \sigma_r),
-\end{align}
+\begin{multline}\label{eq:marginal}
+\pdf(r)\\
+= \iint \sum_{j=1}^K w_j \mathcal{N}_3(p| p_i, \sigma_p) \Theta(q| q_i, \sigma_q) \mathcal{N}_2(r| r_i, \sigma_r) \textnormal{d}p\textnormal{d}q \\
+=  \sum_{j=1}^K w_j \mathcal{N}_2(r| r_j, \sigma_r),
+\end{multline}
 where $x_j = (p_j, q_j, r_j)$.
 The  conditional density $\pdf(p,q|r)$ is given by
-\begin{align}\label{eq:conditional}
-\pdf(p,q|{r}) & = \frac{\pdf(p, q, {r})}{\pdf({r})} \\
-                   & = \frac{\sum_{j=1}^K w_j \mathcal{N}_2({r}| r_j, \sigma_r) \mathcal{N}_3(p| p_j, \sigma_p) \Theta(q|q_j, \sigma_q)}{\sum_{j=1}^K w_j \mathcal{N}_2({r}| r_j, \sigma_r)}. 
-\end{align}
+\begin{multline}\label{eq:conditional}
+\pdf(p,q|{r}) = \frac{\pdf(p, q, {r})}{\pdf({r})}\\
+= \frac{\sum_{j=1}^K w_j \mathcal{N}_2({r}| r_j, \sigma_r) \mathcal{N}_3(p| p_j, \sigma_p) \Theta(q|q_j, \sigma_q)}{\sum_{j=1}^K w_j \mathcal{N}_2({r}| r_j, \sigma_r)}. 
+\end{multline}
 
 \subsection{Surface Features}
 \label{sec:surface_features}
@@ -57,54 +57,128 @@ The surface normal and the principal directions define the orientation $q$ of a 
 \subsection{Object Model}
 \label{sec:object_model}
 
-Thus, given a point cloud, a set of $K_O$ features  $\lbrace (v_j, r_j) \rbrace$ can be computed. This set of features defines, in turn, a joint probability distribution, which we call the \emph{object model}:
+Thus, given a point cloud of object $n = 1..N_O$, a set of $K_{O_n}$ features $\lbrace (v_{jn}, r_{jn}) \rbrace$ can be computed. This set of features defines, in turn, a joint probability distribution, which we call the \emph{object model}:
 \begin{equation}
-\om(v, r) \equiv \pdf^\om(v, r) \simeq \sum_{j=1}^{K_O} w_j \mathcal{K}(v, r|{x_j}, \sigma_{x})
+\om_n(v, r) \equiv \pdf^\om(v, r) \simeq \sum_{j=1}^{K_{O_n}} w_{jn} \mathcal{K}(v, r|{x_{jn}}, \sigma_{x})
 %RD: mu and sigma are not properly defined.
 \label{eq:om}
 \end{equation}
-where $\om$ is short for $\pdf^\om$, $x_j = (v_j, r_j)$,  $\mathcal{K}$ is defined in \eq\eqref{eq:kernel_in_se3} with bandwidth $\sigma_{x} = (\sigma_{v}, \sigma_{r})$, and where all weights are equal, $w_j = 1/{K_O}$. In summary this object model $\om$ represents the object as a pdf over surface normals and curvatures.
+where $\om$ is short for $\pdf^\om$, $x_j = (v_j, r_j)$,  $\mathcal{K}$ is defined in \eq\eqref{eq:kernel_in_se3} with bandwidth $\sigma_{x} = (\sigma_{v}, \sigma_{r})$, and where all weights are equal, $w_{jn} = 1/{K_{O_n}}$. In summary this object model $\om$ represents the object as a pdf over surface normals and curvatures.
 
 \section{LEARNED MODELS}
 
-We now describe the representations for each of the three models that are learned from a set of grasp examples. We start with the contact model, proceed with the equilibrium state hand configuration model, and finish with the reach to grasp model.
+We now describe the representations for each of the three models that are learned from a set of grasp examples. We start with the contact receptive field, proceed with the contact model, the equilibrium state hand configuration model, and finish with the reach to grasp model.
+
+\subsection{Contact Receptive Field}\label{sec:contact_recfield}
+
+\begin{figure}[t]
+\centerline{\includegraphics[width=6cm]{resources/contact}}
+\caption[Contact receptive field]{The contact receptive field $\rf$ associated with the $i$-th link $\rl_i$ (solid yellow block) with link pose $s_i$. The black dots are samples from the surface of an object. The distance $a$ between feature $v$ and the closest point $a$ on the link's surface is shown. The rounded rectangle illustrates the cut-off distance $\delta_i$. The poses $v$ and $s_i$ are expressed in the world frame $W$. The arrow $u$ is the pose of $\rl_i$ relative to the frame for the surface feature $v$.}
+\label{fig:contact_recfield}
+\end{figure}
+
+The \textit{contact receptive field} $\rf_i$ is a region of space relative to the associated robot link $\rl_i$ (see \fig\ref{fig:contact_recfield}) which specifies the neighbourhood of a particular robot link. The contact receptive field $\rf_i$ is realised as a function of surface feature $x$:
+\begin{equation}
+\rf_{i} : x \rightarrow 0..1
+\label{eq:contact_recfield_model}
+\end{equation}
+the value of which determines the relevance of a particular surface feature $x = (v, r)$ to a given link $\rl_i$ in terms of the likelihood of the physical contact. We use contact receptive fields which are family of parameterised functions for which the value falls off quickly with the distance to the link:
+\begin{equation}
+\rf_{i}(x|\lambda_i,\delta_i) = \begin{cases}\exp(-\lambda_i ||p-a||^2) \quad &\textnormal{ if } ||p-a|| < \delta_i\\
+0 \quad &\textnormal{ otherwise},\end{cases}
+\label{eq:contact_recfield_func}
+\end{equation}
+where $\lambda_i \in \mathbb R^{+}$ and $a$ is the point on the surface of $\rl_i$ that is closest to $v = (p, q)$. This means that the contact contact receptive field will only take account of the local shape, while falling off smoothly. A variety of monotonic, fast declining functions could be used instead.
+
 
 \subsection{Contact Model}\label{sec:contact.model}
 
-A contact model $\cm_i$ encodes the joint probability distribution of surface curvatures and of the 3D pose of the $i$-th hand link in the equilibrium state. Let us consider the hand as having grasped some given training object. The contact model for link $\rl_i$ is denoted by
-\begin{equation}\label{eq:M}
-\cm_i(U, R) \equiv \pdf^\cm_i(U, R)
-\end{equation}
-where $\cm_i$ is short for $\pdf^\cm_i$, $R$ is the random variable modelling surface curvature, and $U$ models the pose of $\rl_i$ \emph{relative} to the frame of reference defined by the directions of principal curvature and the surface normal. In other words, denoting realisations of $R$ and $U$ by $r$ and $u$, $\cm_i(u, r)$ is proportional to the probability of finding $\rl_i$ at pose $u$ relative to the frame of a nearby object surface patch that exhibits principal curvatures equal to $r$.
-
-Given a set of features $\lbrace x_j \rbrace_{j=1}^{K_O}$, with $x_j = (v_j, r_j)$ and $v_j = (p_j, q_j)$, a contact model $\cm_i$ is constructed from them.  Features close to the link surface are more important than those lying far from the surface. Features are thus weighted, to make their influence on $\cm_i$  decrease with their distance to the $i^\textnormal{th}$ link. %(\fig\ref{fig:representations.modeldist.cont}). 
-We use a weighting function whose value decreases exponentially with the square distance to the link:
-\begin{equation}
-w_{ij} = \begin{cases}\exp(-\lambda ||p_j-a_{ij}||^2) \quad &\textnormal{ if } ||p_j-a_{ij}|| < \delta_i\\
-0 \quad &\textnormal{ otherwise},\end{cases}
-\label{eq:learning.modeldist.wgh}
-\end{equation}
-where $\lambda \in \mathbb R^{+}$, there is a cut-off distance $\delta_i$, and $a_{ij}$ is the point on the surface of $\rl_i$ that is closest to $p_j$. The intuitive motivation for this choice is that we require a weight function that falls off quickly so that the contact model will only take account of the local shape, while falling off smoothly.
-
-Let us denote by $u_{ij} = (p_{ij}, q_{ij})$ the pose of $\rl_i$ relative to the pose $v_j$ of the $j^{\mathnormal{th}}$ surface feature. In other words, $u_{ij}$ is defined as
+Let us denote by $u_{ij} = (p_{ij}, q_{ij})$ the pose of $\rl_i$ relative to the pose $v_j$ of the $j$-th object feature. In other words, $u_{ij}$ is defined as
 \begin{equation}
 u_{ij} = v_j^{-1} \circ s_i,
 \label{eq:local.pose}
 \end{equation}
-where $s_i$ denotes the pose of $\rl_i$, $\circ$ denotes the pose composition operator, and $v_j^{-1}$ is the inverse of $v_j$, with $v_j^{-1} = (-q_j^{-1}p_j, q_j^{-1})$ (see \fig\ref{fig:representations.model}). The contact model is estimated as
-\begin{equation}
-\cm_i(u,r) \simeq \frac 1Z \sum^{K_{M_i}}_{j=1} w_{ij}\mathcal{N}_3(p|{p_{ij}}, \sigma_{p}) \Theta(q|{q_{ij}}, \sigma_{q}) \mathcal{N}_2(r|{r_j}, \sigma_{r})
-\label{eq:cm}
-\end{equation}
-where $Z$ is a normalising constant, $u = (p, q)$, and where $K_{M_i} \leq K_O$ is a number of features which are within cut-off distance $\delta_i$ to the surface of link $\rl_i$. If the number of features $K_{M_i}$ of contact model $\cm_i$ is not sufficiently large, contact model $\cm_i$ is not instantiated and is excluded from any further computation. Consequently, the overall number of contact models $N_M$ is usually smaller than the number of links $N_L$ of the robotic hand. We denote the set of contact models learned from a grasp example $g$ as $\mathcal{M}^g=\{\mathcal{M}^g_i\}$. 
-%Sum~\eqref{eq:cm} involves only terms for which $x_j = ((p_j, q_j), r_j)$ belong to the neighbourhood of $\rf_i$, $\lbrace x_j: ||p_j-a_{ij}|| \leq \delta, \delta \in \mathbb R^{+} \rbrace$. If the neighbourhood of a particular link $i$ is empty, i.e. $K_{M_i} = 0$, the corresponding contact model is not instantiated and it is excluded from any further computation.
-\begin{figure}[t]
-\centerline{\includegraphics[width=5cm]{resources/model}}
-\caption[Contact model]{Contact model. The figure shows the $i$-th link $\rl_i$ (solid block) and its pose $s_i$. The black dots are samples of the surface of an object. The distance $a_{ij}$ between a feature $v_j$ and the closest point on the link's surface is shown. The rounded rectangle illustrates the cut-off distance $\delta_i$. The poses $v_j$ and $s_i$ are expressed in the world frame $W$. The arrow $u_{ij}$ is the pose of $\rl_i$ relative to the frame for the surface feature $v_j$.}
-\label{fig:representations.model}
-\end{figure}
+where $s_i$ denotes the pose of $\rl_i$, $\circ$ denotes the pose composition operator, and $v_j^{-1}$ is the inverse of $v_j$, with $v_j^{-1} = (-q_j^{-1}p_j, q_j^{-1})$ (see \fig\ref{fig:contact_recfield}). 
 
-The parameters $\lambda$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model from an example grasp is $\Omega(T K_O)$ where $T$ is the number of triangles in the tri-mesh describing the hand links, and $K_O$ is the number of points in the object model.
+Contact model $\cm_{in}$ encodes the joint probability distribution of surface features of object $n$ and of the 3D pose of the $i$-th hand link in the equilibrium state. Let us consider the hand as having grasped given training object $n$. The contact model for link $\rl_i$ is denoted by
+\begin{equation}\label{eq:M}
+\cm_{in}(U, R) \equiv \pdf^\cm_{in}(U, R)
+\end{equation}
+where $\cm_i$ is short for $\pdf^\cm_{in}$, $R$ is the random variable modelling surface features of object $n$, and $U$ models the pose of $\rl_i$ \emph{relative} to the frame of reference defined by the directions of principal curvature and the surface normal. In other words, denoting realisations of $R$ and $U$ by $r$ and $u$, $\cm_{in}(u, r)$ is proportional to the probability of finding $\rl_i$ at pose $u$ relative to the frame of a nearby object surface patch that exhibits features (principal curvatures) equal to $r$.
+
+The contact model of object $n$ is estimated as
+\begin{equation}\label{eq:cm_n}
+\begin{split}
+&\cm_{in}(u, r) \simeq \frac 1Z \int \mathcal{K}(u|v^{-1}s_i, \sigma_\cm) \om_{n}(v, r) \rf_{i}(t) dv\\
+&= \frac 1Z \sum_{j=1}^{K_{O_n}} \mathcal{K}(u|v_k^{-1}s_i, \sigma_v) \mathcal{N}_2({r}| r_{jn}, \sigma_r) \rf_{i}(x_{jn})
+\end{split}
+\end{equation}
+where $Z \in \mathbb R^+$ is a normalising constant and $\mathcal{K}$ is kernel function \eqref{eq:kernel_in_se3} defined at poses from \eq\eqref{eq:local.pose}, and where we have performed integration over all kernels of the object model \eqref{eq:om} which uniquely determine poses $v$.
+
+We also introduce \textit{contact model norm}, which estimates the likelihood of a physical contact of link $i$ with points on the object $n$:
+\begin{equation}\label{eq:cm_norm}
+\|\cm_{in}\| = \frac 1Z \sum_{j=1}^{K_{O_n}} \rf_{i}(x_{jn})
+\end{equation}
+where $Z \in \mathbb R^+$ is a normalising constant.
+
+\subsection{Contact Model Selection}
+
+The overall number of non-empty contact models $\cm_{in}$ for the example grasp $n$ is usually smaller than the number of links $N_L$ of the robot hand. The contact selection procedure determines which contact models should be instantiated for a given grasp type, but also determines which contact models for different robot links can be merged together. The procedure starts with an evaluation of the contact model norms \eqref{eq:cm_norm} for all part models. Then, the result is compared with a average value for all grasp examples $n$ and stored in binary variables $b_{in}$ as follows:
+\begin{equation}
+b_{in} = \begin{cases} 1 \quad &\textnormal{ if } \frac{\|\cm_{in}\|}{\sum_n\{\|\cm_{in}\|\}} > \eta_i \\
+0 \quad &\textnormal{ otherwise},\end{cases}
+\label{eq:cm_n_binary}
+\end{equation}
+where $\eta_i \in \mathbb{R}^+$ is a threshold constant.
+
+The contact model $\cm_i$ is instantiated if the total number of non-empty contact models, determined by $b_{in}$, is higher than some minimum value given the total number of objects or training grasps $N_O$. This is encoded in the binary variable $b_i$:
+\begin{equation}
+b_i = \begin{cases} 1 \quad &\textnormal{ if } \frac{1}{N_O} \sum_k b_{ik} > \zeta\\
+0 \quad &\textnormal{ otherwise},\end{cases}
+\label{eq:cm_binary}
+\end{equation}
+where $\zeta \in \mathbb{R}^+$ is a threshold constant. The contact model $\cm_i$ is then constructed as a mixture of $\cm_{in}$ as follows:
+\begin{equation}\label{eq:cm}
+\cm_{i}(u, r) = \sum_{n=1}^{N_O} b_{i} b_{in} \cm_{in}(u, r)
+\end{equation}
+
+We denote the set of contact models learned from a grasp example $g$ as $\mathcal{\cm}^g=\{\mathcal{\cm}^g_i\}$. The contact models are quite different for the different links within a grasp because they typically consist of different object part models. The parameters $\lambda$, $\eta$, $\zeta$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model $\cm_{in}(u, r)$ from an example grasp is $\Omega(T_i K_{O_n})$ where $T_i$ is the number of triangles in the tri-mesh describing hand link $i$, and $K_{O_n}$ is the average number of points in the object model.
+
+
+%\begin{figure}[t]
+%\centerline{\includegraphics[width=5cm]{resources/contact}}
+%\caption[Contact model]{Contact model. The figure shows the $i$-th link $\rl_i$ (solid block) and its pose $s_i$. The black dots are samples of the surface of an object. The distance $a_{ij}$ between a feature $v_j$ and the closest point on the link's surface is shown. The rounded rectangle illustrates the cut-off distance $\delta_i$. The poses $v_j$ and $s_i$ are expressed in the world frame $W$. The arrow $u_{ij}$ is the pose of $\rl_i$ relative to the frame for the surface feature $v_j$.}
+%\label{fig:representations.model}
+%\end{figure}
+%
+%A contact model $\cm_i$ encodes the joint probability distribution of surface curvatures and of the 3D pose of the $i$-th hand link in the equilibrium state. Let us consider the hand as having grasped some given training object. The contact model for link $\rl_i$ is denoted by
+%\begin{equation}\label{eq:M}
+%\cm_i(U, R) \equiv \pdf^\cm_i(U, R)
+%\end{equation}
+%where $\cm_i$ is short for $\pdf^\cm_i$, $R$ is the random variable modelling surface curvature, and $U$ models the pose of $\rl_i$ \emph{relative} to the frame of reference defined by the directions of principal curvature and the surface normal. In other words, denoting realisations of $R$ and $U$ by $r$ and $u$, $\cm_i(u, r)$ is proportional to the probability of finding $\rl_i$ at pose $u$ relative to the frame of a nearby object surface patch that exhibits principal curvatures equal to $r$.
+%
+%Given a set of features $\lbrace x_j \rbrace_{j=1}^{K_O}$, with $x_j = (v_j, r_j)$ and $v_j = (p_j, q_j)$, a contact model $\cm_i$ is constructed from them.  Features close to the link surface are more important than those lying far from the surface. Features are thus weighted, to make their influence on $\cm_i$  decrease with their distance to the $i^\textnormal{th}$ link. %(\fig\ref{fig:representations.modeldist.cont}). 
+%We use a weighting function whose value decreases exponentially with the square distance to the link:
+%\begin{equation}
+%w_{ij} = \begin{cases}\exp(-\lambda ||p_j-a_{ij}||^2) \quad &\textnormal{ if } ||p_j-a_{ij}|| < \delta_i\\
+%0 \quad &\textnormal{ otherwise},\end{cases}
+%\label{eq:learning.modeldist.wgh}
+%\end{equation}
+%where $\lambda \in \mathbb R^{+}$, there is a cut-off distance $\delta_i$, and $a_{ij}$ is the point on the surface of $\rl_i$ that is closest to $p_j$. The intuitive motivation for this choice is that we require a weight function that falls off quickly so that the contact model will only take account of the local shape, while falling off smoothly.
+%
+%Let us denote by $u_{ij} = (p_{ij}, q_{ij})$ the pose of $\rl_i$ relative to the pose $v_j$ of the $j^{\mathnormal{th}}$ surface feature. In other words, $u_{ij}$ is defined as
+%\begin{equation}
+%u_{ij} = v_j^{-1} \circ s_i,
+%\label{eq:local.pose}
+%\end{equation}
+%where $s_i$ denotes the pose of $\rl_i$, $\circ$ denotes the pose composition operator, and $v_j^{-1}$ is the inverse of $v_j$, with $v_j^{-1} = (-q_j^{-1}p_j, q_j^{-1})$ (see \fig\ref{fig:representations.model}). The contact model is estimated as
+%\begin{equation}
+%\cm_i(u,r) \simeq \frac 1Z \sum^{K_{M_i}}_{j=1} w_{ij}\mathcal{N}_3(p|{p_{ij}}, \sigma_{p}) \Theta(q|{q_{ij}}, \sigma_{q}) \mathcal{N}_2(r|{r_j}, \sigma_{r})
+%\label{eq:cm}
+%\end{equation}
+%where $Z$ is a normalising constant, $u = (p, q)$, and where $K_{M_i} \leq K_O$ is a number of features which are within cut-off distance $\delta_i$ to the surface of link $\rl_i$. If the number of features $K_{M_i}$ of contact model $\cm_i$ is not sufficiently large, contact model $\cm_i$ is not instantiated and is excluded from any further computation. Consequently, the overall number of contact models $N_M$ is usually smaller than the number of links $N_L$ of the robotic hand. We denote the set of contact models learned from a grasp example $g$ as $\mathcal{M}^g=\{\mathcal{M}^g_i\}$. 
+%%Sum~\eqref{eq:cm} involves only terms for which $x_j = ((p_j, q_j), r_j)$ belong to the neighbourhood of $\rf_i$, $\lbrace x_j: ||p_j-a_{ij}|| \leq \delta, \delta \in \mathbb R^{+} \rbrace$. If the neighbourhood of a particular link $i$ is empty, i.e. $K_{M_i} = 0$, the corresponding contact model is not instantiated and it is excluded from any further computation.
+%The parameters $\lambda$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model from an example grasp is $\Omega(T K_O)$ where $T$ is the number of triangles in the tri-mesh describing the hand links, and $K_O$ is the number of points in the object model.
 
 %\begin{figure}[t]
 %\centering{
@@ -118,9 +192,9 @@ The parameters $\lambda$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chose
 
 \subsection{Equilibrium State Hand Configuration Model}
 
-The equilibrium state hand configuration model, denoted $h^e_c(j) \in \mathbb R^D$, for the grasp examples $j = 1 \ldots k$ within the set of $k$ training examples of a particular grasp type $g$. The purpose of this model is to restrict the grasp search space (during grasp transfer) to hand configurations that resemble those observed during training. We combine the configurations for the examples $j = 1 \ldots k$ to create a single mixture model density:
+The equilibrium state hand configuration model, denoted $h^e_c(j) \in \mathbb R^D$, for the grasp examples $n = 1 \ldots N_O$ within the set of $n$ training examples of a particular grasp type $g$. The purpose of this model is to restrict the grasp search space (during grasp transfer) to hand configurations that resemble those observed during training. We combine the configurations for the examples $n = 1 \ldots N_O$ to create a single mixture model density:
 \begin{equation}
-\hc^g(h^e_c) \equiv \sum_{j=1}^{k} \mathcal{N}_D(h^e_c|h^e_c(j), \sigma_{h^e_c}) 
+\hc^g(h^e_c) \equiv \sum_{n=1}^{N_O} \mathcal{N}_D(h^e_c|h^e_c(n), \sigma_{h^e_c}) 
 \label{eq:hc}
 \end{equation}
 This expresses a density over hand configurations in the equilibrium state for a grasp type $g$.
