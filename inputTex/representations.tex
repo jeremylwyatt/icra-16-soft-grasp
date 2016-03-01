@@ -125,7 +125,7 @@ where $Z \in \mathbb R^+$ is a normalising constant.
 
 The overall number of non-empty contact models $\cm_{in}$ for the example grasp $n$ is usually smaller than the number of links $N_L$ of the robot hand. The contact selection procedure determines which contact models should be instantiated for a given grasp type, but also determines which contact models for different robot links can be merged together. The procedure starts with an evaluation of the contact model norms \eqref{eq:cm_norm} for all part models. Then, the result is compared with a average value for all grasp examples $n$ and stored in binary variables $b_{in}$ as follows:
 \begin{equation}
-b_{in} = \begin{cases} 1 \quad &\textnormal{ if } \frac{\|\cm_{in}\|}{\sum_n\{\|\cm_{in}\|\}} > \eta_i \\
+b_{in} = \begin{cases} 1 \quad &\textnormal{ if } \frac{N_O \|\cm_{in}\|}{\sum_n\{\|\cm_{in}\|\}} > \eta_i \\
 0 \quad &\textnormal{ otherwise},\end{cases}
 \label{eq:cm_n_binary}
 \end{equation}
