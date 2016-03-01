@@ -63,7 +63,7 @@ Thus, given a point cloud of object $n = 1..N_O$, a set of $K_{O_n}$ features $\
 %RD: mu and sigma are not properly defined.
 \label{eq:om}
 \end{equation}
-where $\om$ is short for $\pdf^\om$, $x_j = (v_j, r_j)$,  $\mathcal{K}$ is defined in \eq\eqref{eq:kernel_in_se3} with bandwidth $\sigma_{x} = (\sigma_{v}, \sigma_{r})$, and where all weights are equal, $w_{jn} = 1/{K_{O_n}}$. In summary this object model $\om$ represents the object as a pdf over surface normals and curvatures.
+where $\om$ is short for $\pdf^\om$, $x_{jn} = (v_{jn}, r_{jn})$,  $\mathcal{K}$ is defined in \eq\eqref{eq:kernel_in_se3} with bandwidth $\sigma_{x} = (\sigma_{v}, \sigma_{r})$, and where all weights are equal, $w_{jn} = 1/{K_{O_n}}$. In summary this object model $\om$ represents the object as a pdf over surface normals and curvatures.
 
 \section{LEARNED MODELS}
 
