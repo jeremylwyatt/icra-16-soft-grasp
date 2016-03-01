@@ -1,0 +1,39 @@
+Reviewer 9 of ICRA 2016 submission 2408
+
+Comments to the author
+======================
+
+The authors present a learning-based approach for grasping
+novel objects with underactuated hands. Models for final
+grasps, approach trajectories and closing control
+strategies are learned through the generation of simulated
+training examples of different grasp types on a set of
+different objects. Experimental results demonstrate the
+efficacy of the approach.
+
+The language is good, with just a few typos.
+
+The structure is clear in general, although I believe that
+section III should have been introducing all physical
+quantities before outlining the Kernel Density Estimation -
+this would have allowed the reader to understand the
+concepts more easily.
+
+It appears that a significant portion of the modeling and
+learning methods presented in this paper have been
+published in the past for the case of fully actuated hands
+by some of the same authors, i.e., in the papers "One-shot
+learning and generation of dexterous grasps for novel
+objects" (IJRR 15') and "Learning dexterous grasps that
+generalise to novel objects by combining hand and contact
+models" (ICRA 14'). As a result the main contribution of
+this paper appears to be the application of the previously
+described learning approach to the case of underactuated
+hands. However, no emphasis is given to the particularities
+of underactuation, with the modeling/learning sections
+covering a significant portion of the paper. Perhaps a more
+in-depth discussion and modeling of the uncertainties of
+underactuation would strengthen this work. Based on this
+reasoning, although the results included appear to be
+technologically appealing, I feel that there is a
+significant lack of theoretical contribution in this paper. 

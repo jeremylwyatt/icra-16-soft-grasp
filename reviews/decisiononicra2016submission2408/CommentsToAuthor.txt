@@ -1,0 +1,15 @@
+The main purpose of this paper appears to be the
+application of the authors' previously published learning
+approach to the case of underactuated hands (as opposed to
+fully actuated hands in the past). However, no emphasis is
+given to the particularities of underactuation, such as
+exploiting environmental constraints. All three reviewers
+agreed that the technical contribution is therefore
+insufficient for a new paper. The evaluations and
+references are also insufficient; comparisons to other
+underactuated methods would help make the case for the
+authors' learning approach in the underactuated context.
+
+----------------------------------------
+Comments on Video Attachment:
+

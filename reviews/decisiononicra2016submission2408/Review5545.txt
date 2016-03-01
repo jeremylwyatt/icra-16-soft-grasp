@@ -1,0 +1,64 @@
+Reviewer 7 of ICRA 2016 submission 2408
+
+Comments to the author
+======================
+
+The goal of the algorithm in this paper is to learn grasps
+for underactuated hands that can be transferred to novel
+objects.
+
+Grasps are divided into grasp types, each of which is
+handled differently.   A few (9 in this paper) examples are
+collected from a user controlling a simulation.   I am not
+clear on how the user controls the simulation.	 A model of
+the grasp is represented as a product of experts: a contact
+model, a final hand configuration model, and a reach to
+grasp model, which includes wrist and hand trajectories as
+well as control signals.    Grasp candidates are evaluated
+by randomly selecting a grasp type and a finger link,
+sampling from the likely locations that link could be
+placed on the new object, sampling a likely final hand
+configuration, and reach to grasp pose.   An optimization
+step refines the results to obtain the most likely grasp
+given the examples.
+
+The learning approach has been presented in previous work
+by the authors and tested with dexterous hands.    The
+novel contribution of the present paper is to evaluate this
+model on underactuated hands.	In addition to learning the
+final grasp, the approach trajectory and control strategy
+are also learned.    Why is this necessary?    If you
+simply apply the previous learning approach to
+underactuated hands, does it fail?    If so, in what manner
+does it fail?	How do these extensions to the previous
+learning model make it better?
+
+I did not rate this paper more highly, because I do not see
+the new contributions of this paper clearly expressed and
+the need for those new contributions clearly demonstrated. 
+   I would have appreciated:   1. Show me limitations of
+your existing approach for articulated hands in a clear
+way;  2. Give a clear motivation for how the extensions to
+your algorithm will solve the problem;	 3. Evaluate the
+new aspects of the algorithm in a clear comparison test.
+
+Another general comment – these models are being
+constructed from very few examples in very high dimensional
+spaces.    My interpretation, then, is that the search that
+is occurring is basically attempting to identify the
+nearest neighbor from the example grasps that best matches
+the observed geometry of the novel object.    If so,
+couldn’t this be done in a simpler way, e.g., by simply
+searching for similar shape features on the novel object?  
+  I would appreciate comments on this intuition in a future
+version of the manuscript.
+
+Misc.
+
+I am not clear on the significance of the two images in
+Figure 1.   Are they meant to be two different training
+grasps?
+
+The authors’ prior work is mentioned, but not specifically
+cited in the Related Work section.   “We have previously
+achieved…”    Are you referring to reference [18]?

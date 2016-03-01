@@ -1,0 +1,97 @@
+Reviewer 8 of ICRA 2016 submission 2408
+
+Comments to the author
+======================
+
+Summary
+The authors present a probabilistic model of grasps for
+underactuated robot hands. The model includes the final
+equilibrium grasp and the trajectory leading to the grasp.
+The authors learned three grasp types and evaluated the
+method on a set of fifteen test objects.
+
+
+Clarity
+Although the paper is well written, the description of the
+model can be quite confusing. Including additional
+illustrations and simplifying the notation could make these
+sections clearer.
+
+The authors do not explain their design choices
+sufficiently. Motivating the individual model components
+could help readers to get a better understanding of the
+model and clarify how the model is being modified
+specifically for underactuated hands.
+
+The final equilibrium grasp seems to depend on the initial
+point cloud of the object, and the robot applies a penalty
+for trajectories that collide with the object's point
+cloud. The learned grasps therefore actively avoid push
+grasps and other behaviors that would exploit the
+environmental constraints. Underactuated hands often need
+to exploit these constraints to compensate for their lack
+of actuation. 
+
+How precise does the trajectory need to be if the robot is
+not moving the object?
+
+The advantages of the method over previous methods need to
+be explained in detail	in the related work. Why are
+appearance-based approaches not suitable for grasping with
+underactuated grasps? These methods learn the contacts
+implicitly based on the shape of the object, and should
+therefore complement underactuated hands. 
+
+The authors mention multiple times that the approach works
+with partial point clouds. However, most of the test grasps
+were of objects with thin walls, where the occlusion issue
+is minor, and the method does not seem to explicitly handle
+occlusions. This claim is therefore misleading, and the
+authors should avoid overstating it. 
+
+"for the first time" - Are the authors claiming that this
+is the first example of transferring grasps of an
+underactuated hand, or the first time that their method has
+been used for this setting?
+
+The references should be updated to include some of the
+more recent work on grasping, e.g.
+Lenz et al., Deep Learning for Detecting Robotic Grasps,
+IJRR 2014
+Kroemer et al., Predicting Object Interactions from Contact
+Distributions, IROS 2014
+Bohg et al., Data-Driven Grasp Synthesis - A Survey, TRO
+2014
+
+
+Quality
+The authors need to thoroughly evaluate their method and
+compare it to existing methods. The only comparison is to
+the authors' previous result, which did not perform
+significantly worse despite being evaluated on a more
+challenging object set. 
+
+The authors mention several papers [1-4] that select grasps
+based on local appearance. The authors should include a
+comparison to such an approach. The authors' method also
+uses a grasp simulation during learning. They should
+compare to a simulation-based approach [11].
+
+One of the contributions of the paper is to learn from
+multiple training samples. The authors should explore more
+than three grasp types. Is it necessary for an
+underactuated hand to differentiate between a pinch and a
+rim grasp? Should the hand not adapt to such minor
+variations automatically? Would the method otherwise not
+generalize between these two grasps?
+
+
+Significance
+Learning grasps for underactuated hands is an important and
+challenging research topic. However, the authors have not
+explained how the method is tailored for underactuated
+hands and the method avoids exploiting environmental
+constraints. The evaluations are also insufficient and need
+to compare to other methods. Although the method has
+potential, the paper is currently not suitable for
+publication.
