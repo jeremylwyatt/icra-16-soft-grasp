@@ -93,7 +93,7 @@ where $\lambda_i \in \mathbb R^{+}$ and $a$ is the point on the surface of $\rl_
 
 \subsection{Contact Model}\label{sec:contact.model}
 
-Let us assume that we have as many grasp examples of the same type as the number of objects $N_O$. We denote by $u_{ij} = (p_{ij}, q_{ij})$ the pose of $\rl_i$ relative to the pose $v_j$ of the $j$-th object feature. In other words, $u_{ij}$ is defined as
+Let us assume that we have as many grasp examples of the same grasp type $g$ as the number of objects $N_O$. We denote by $u_{ij} = (p_{ij}, q_{ij})$ the pose of $\rl_i$ relative to the pose $v_j$ of the $j$-th object feature. In other words, $u_{ij}$ is defined as
 \begin{equation}
 u_{ij} = v_j^{-1} \circ s_i,
 \label{eq:local.pose}
@@ -142,7 +142,7 @@ where $\zeta \in \mathbb{R}^+$ is a threshold constant. The contact model $\cm_i
 \cm_{i}(u, r) = \sum_{n=1}^{N_O} c_{i} b_{in} \cm_{in}(u, r)
 \end{equation}
 
-We denote the set of contact models learned from a grasp example $g$ as $\mathcal{\cm}^g=\{\mathcal{\cm}^g_i\}$. The parameters $\lambda$, $\eta$, $\zeta$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model $\cm_{in}(u, r)$ from an example grasp is $\Omega(T_i K_{O_n})$ where $T_i$ is the number of triangles in the tri-mesh describing hand link $i$, and $K_{O_n}$ is the number of points of object $n$.
+We denote the set of contact models learned for a particular grasp type $g$ as $\mathcal{\cm}^g=\{\mathcal{\cm}^g_i\}$. The parameters $\lambda$, $\eta$, $\zeta$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model $\cm_{in}(u, r)$ from an example grasp is $\Omega(T_i K_{O_n})$ where $T_i$ is the number of triangles in the tri-mesh describing hand link $i$, and $K_{O_n}$ is the number of points of object $n$.
 
 
 %\begin{figure}[t]
