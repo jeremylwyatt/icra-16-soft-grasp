@@ -110,7 +110,7 @@ The contact model of object $n$ is estimated as
 \begin{equation}\label{eq:cm_n}
 \begin{split}
 &\cm_{in}(u, r) \simeq \frac 1Z \int \mathcal{K}(u|v^{-1}s_i, \sigma_\cm) \om_{n}(v, r) \rf_{i}(v) dv\\
-&= \frac 1Z \sum_{j=1}^{K_{O_n}} \mathcal{K}(u|v_k^{-1}s_i, \sigma_v) \mathcal{N}_2({r}| r_{jn}, \sigma_r) \rf_{i}(v_{jn})
+&= \frac 1Z \sum_{j=1}^{K_{O_n}} \mathcal{K}(u|v_{jn}^{-1}s_i, \sigma_v) \mathcal{N}_2({r}| r_{jn}, \sigma_r) \rf_{i}(v_{jn})
 \end{split}
 \end{equation}
 where $Z \in \mathbb R^+$ is a normalising constant and $\mathcal{K}$ is kernel function \eqref{eq:kernel_in_se3} defined at poses from \eq\eqref{eq:local.pose}, and where we have performed integration over all kernels of the object model \eqref{eq:om} which uniquely determine poses $v$.
@@ -142,7 +142,7 @@ where $\zeta \in \mathbb{R}^+$ is a threshold constant. The contact model $\cm_i
 \cm_{i}(u, r) = \sum_{n=1}^{N_O} b_{i} b_{in} \cm_{in}(u, r)
 \end{equation}
 
-We denote the set of contact models learned from a grasp example $g$ as $\mathcal{\cm}^g=\{\mathcal{\cm}^g_i\}$. The contact models are quite different for the different links within a grasp because they typically consist of different object part models. The parameters $\lambda$, $\eta$, $\zeta$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model $\cm_{in}(u, r)$ from an example grasp is $\Omega(T_i K_{O_n})$ where $T_i$ is the number of triangles in the tri-mesh describing hand link $i$, and $K_{O_n}$ is the average number of points in the object model.
+We denote the set of contact models learned from a grasp example $g$ as $\mathcal{\cm}^g=\{\mathcal{\cm}^g_i\}$. The contact models are quite different for the different links within a grasp because they typically consist of different object part models. The parameters $\lambda$, $\eta$, $\zeta$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model $\cm_{in}(u, r)$ from an example grasp is $\Omega(T_i K_{O_n})$ where $T_i$ is the number of triangles in the tri-mesh describing hand link $i$, and $K_{O_n}$ is the number of points of object $n$.
 
 
 %\begin{figure}[t]
