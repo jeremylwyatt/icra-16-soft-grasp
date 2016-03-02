@@ -142,7 +142,7 @@ where $\zeta \in \mathbb{R}^+$ is a threshold constant. The contact model $\cm_i
 \cm_{i}(u, r) = \sum_{n=1}^{N_O} c_{i} b_{in} \cm_{in}(u, r)
 \end{equation}
 
-We denote the set of contact models learned for a particular grasp type $g$ as $\mathcal{\cm}^g=\{\mathcal{\cm}^g_i\}$. The parameters $\lambda$, $\eta$, $\zeta$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model $\cm_{in}(u, r)$ from an example grasp is $\Omega(T_i K_{O_n})$ where $T_i$ is the number of triangles in the tri-mesh describing hand link $i$, and $K_{O_n}$ is the number of points of object $n$.
+The above procedure is performed independently for each grasp type $g$. Each grasp type may also involve a different set of objects. We denote the set of contact models learned for a particular grasp type $g$ as $\mathcal{\cm}^g=\{\cm^g_i\}$. The parameters $\lambda$, $\eta$, $\zeta$ and $\sigma_{p}$, $\sigma_{q}$, $\sigma_{r}$ were chosen empirically. The time complexity for learning each contact model $\cm_{in}(u, r)$ from an example grasp is $\Omega(T_i K_{O_n})$ where $T_i$ is the number of triangles in the tri-mesh describing hand link $i$, and $K_{O_n}$ is the number of points of object $n$.
 
 
 %\begin{figure}[t]
